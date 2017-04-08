@@ -65,8 +65,9 @@
 	display: inline-block;
 	background-color: #fff;
 	float: right;
-	text-align: left;
-	width: 250px;
+	text-align: center;
+	width: 240px;
+	padding: 5px;
 	height: 500px;
 	border: solid black 1px;
 }
@@ -74,6 +75,33 @@
 .screen_content {
 	display: none;
 }
+
+.perimeter_menu_button {
+	display: inline-block;
+	padding: 4px;
+	background-color: white;
+	border-radius: 3px;
+	border: solid black 1px;
+	box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    text-align: center;
+	font-family: "Open Sans", Arial, sans-serif;
+	cursor: pointer;
+    transition: all 0.15s;
+}
+
+.perimeter_menu_button:hover {
+	background-color: #ddd;
+}
+
+.perimeter_point {
+	margin-top: 2px;
+	padding: 10px;
+	border-radius: 3px;
+	border: solid black 1px;
+	box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    text-align: center;
+}
+
 
 /** Structure */
 body {
@@ -119,4 +147,12 @@ body {
 	text-align: right;
 	width: 370px;
 	height: 500px;
+}
+
+.perimeter_menu {
+	
+}
+
+.perimeter_points_holder {
+	
 }
