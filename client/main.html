@@ -78,6 +78,13 @@ function openRightScreen(button, screenId) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(screenId).style.display = "block";
     button.className += " active";
+	
+	// Button specific actions
+	if (button.id == "perimeter_button") {
+		canvas.addEventListener('mouseup', drawPoint, false);
+	} else {
+		canvas.removeEventListener('mouseup', drawPoint, false);
+	}
 }
 
 
@@ -133,9 +140,7 @@ function init_canvas() {
 	ctx = canvas.getContext("2d");
 	perimeter = [];
 
-	canvas.addEventListener('mouseup', function (e) {
-		drawPoint(e)
-	}, false);
+	canvas.addEventListener('mouseup', drawPoint, false);
 }
     
 
