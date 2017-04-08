@@ -10,7 +10,7 @@
     </div>
 
 	<div class="main_frame">
-		<canvas id="canvas">
+		<canvas id="canvas" width="498px" height="498px">
 		</canvas>
 		
 		<div class="right_panel">
@@ -68,5 +68,42 @@ function openRightScreen(button, screenId) {
     document.getElementById(screenId).style.display = "block";
     button.className += " active";
 }
-</script>
+
+/** Work with canvas */
+function init_canvas() {
+	canvas = document.getElementById('canvas');
+	ctx = canvas.getContext("2d");
+	preX = -1;
+	preY = -1;
+
+	canvas.addEventListener("mouseup", function (e) {
+		drawPoint(e)
+	}, false);
+}
+    
+    
+function drawPoint(evt) {
+	var rect = canvas.getBoundingClientRect();
+	var x = evt.clientX - rect.left;
+	var y = evt.clientY - rect.top;
+	
+	// Draw a point
+	ctx.fillRect(x, y, 2, 2);
+	
+	// Link previous and current points with line
+	if (preX != -1 && preY != -1) {
+		ctx.moveTo(preX, preY);
+		ctx.lineTo(x, y);
+		ctx.strokeStyle = "black";
+		ctx.stroke();
+	}
+
+	preX = x;
+	preY = y;
+}
+    
+
+	
+	init_canvas();
+    </script>
 </body>
