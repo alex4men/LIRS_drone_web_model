@@ -1,0 +1,72 @@
+<head>
+  <title>Drones</title>
+</head>
+
+<body>
+
+<div class="main_block">
+    <div class="header">
+        <h2> DRONES </h2>
+    </div>
+
+	<div class="main_frame">
+		<canvas id="canvas">
+		</canvas>
+		
+		<div class="right_panel">
+			<div class="menu">
+				<div class="menu_button active" id="perimeter_button" onclick="openRightScreen(this, 'screen_perimeter');">
+					<span class="menu_button_text">Perimeter</span>
+				</div>
+				<div class="menu_button" id="stations_button" onclick="openRightScreen(this, 'screen_stations');">
+					<span class="menu_button_text">Stations</span>
+				</div>
+				<div class="menu_button" id="edit_button" onclick="openRightScreen(this, 'screen_edit');">
+					<span class="menu_button_text">Edit</span>
+				</div>
+				<div class="menu_button" id="global_params_button" onclick="openRightScreen(this, 'screen_global_params');">
+					<span class="menu_button_text">Global Params</span>
+				</div>
+			</div>
+			
+			<div class="right_panel_screen">
+				<div class="screen_content" id="screen_perimeter" style="display: block;">
+					Perimeter
+				</div>
+				<div class="screen_content" id="screen_stations">
+					Stations
+				</div>
+				<div class="screen_content" id="screen_edit">
+					Edit
+				</div>
+				<div class="screen_content" id="screen_global_params">
+					Global parameters
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function openRightScreen(button, screenId) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="screen_content" and hide them
+    tabcontent = document.getElementsByClassName("screen_content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="menu_button" and remove the class "active"
+    tablinks = document.getElementsByClassName("menu_button");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(screenId).style.display = "block";
+    button.className += " active";
+}
+</script>
+</body>
