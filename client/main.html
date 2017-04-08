@@ -36,7 +36,7 @@
 						<div class="perimeter_menu_button" id="perimeter_undo" onclick="popPoint();">
 							&#8592; undo
 						</div>
-						<div class="perimeter_menu_button" id="perimeter_redo" onclick="">
+						<div class="perimeter_menu_button" id="perimeter_redo" onclick="restoreDeletedPoint();">
 							redo &#8594;
 						</div>
 					</div>
@@ -120,11 +120,24 @@ function popPoint() {
 	var p = document.getElementById(id);
 	p.parentNode.removeChild(p);
 	
+	deletedPoints.push(perimeter[perimeter.length - 1]);
 	perimeter.pop();
 	
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	
 	redrawCanvas();
+}
+
+
+function restoreDeletedPoint() {
+	if (deletedPoints.length > 0) {
+		var p = deletedPoints.pop();
+		perimeter.push(p);
+		
+		addPoint(p);
+		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		redrawCanvas();
+	}
 }
 
 function redrawCanvas() {
@@ -139,6 +152,7 @@ function init_canvas() {
 	canvas = document.getElementById('canvas');
 	ctx = canvas.getContext("2d");
 	perimeter = [];
+	deletedPoints = [];
 
 	canvas.addEventListener('mouseup', drawPoint, false);
 }
@@ -163,6 +177,8 @@ function drawOnCanvas(prevPoint, point) {
 	
 	
 function drawPoint(evt) {
+	deletedPoints.length = 0;
+	
 	var rect = canvas.getBoundingClientRect();
 	var x = evt.clientX - rect.left;
 	var y = evt.clientY - rect.top;
