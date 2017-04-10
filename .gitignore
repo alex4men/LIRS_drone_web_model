@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-node_modules/
-=======
 # Logs
 logs
 *.log
-npm-debug.log*
+npm-debug.log
 
 # Runtime data
 pids
@@ -45,4 +42,3 @@ settings-production.json
 # macOS stuff
 .DS_Store
 *.DS_Store
->>>>>>> 6fd355e3bc43fe41749982403a925c0cee6656ec
