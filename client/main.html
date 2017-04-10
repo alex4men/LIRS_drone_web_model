@@ -1,25 +1,278 @@
 <head>
-  <title>LIRS_drone_web_model</title>
+  <title>Drones</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
 
-  {{> hello}}
-  {{> info}}
+<div class="main_block">
+    <div class="header">
+        <h2> DRONES </h2>
+    </div>
+
+	<div class="main_frame">
+		<canvas id="canvas" width="498px" height="498px">
+		</canvas>
+		
+		<div class="right_panel">
+			<div class="menu">
+				<div class="menu_button active" id="perimeter_button" onclick="openRightScreen(this, 'screen_perimeter');">
+					<span class="menu_button_text">Perimeter</span>
+				</div>
+				<div class="menu_button" id="stations_button" onclick="openRightScreen(this, 'screen_stations');">
+					<span class="menu_button_text">Stations</span>
+				</div>
+				<div class="menu_button" id="edit_button" onclick="openRightScreen(this, 'screen_edit');">
+					<span class="menu_button_text">Edit</span>
+				</div>
+				<div class="menu_button" id="global_params_button" onclick="openRightScreen(this, 'screen_global_params');">
+					<span class="menu_button_text">Global Params</span>
+				</div>
+			</div>
+			
+			<div class="right_panel_screen">
+				<div class="screen_content" id="screen_perimeter" style="display: block;">
+					<span>Perimeter</span>
+					<div class="perimeter_menu">
+						<div class="perimeter_menu_button" id="perimeter_undo" onclick="popPoint();">
+							&#8592; undo
+						</div>
+						<div class="perimeter_menu_button" id="perimeter_redo" onclick="restoreDeletedPoint();">
+							redo &#8594;
+						</div>
+					</div>
+					<div class="perimeter_points_holder" id="perimeter_points_holder">
+						
+					</div>
+				</div>
+				<div class="screen_content" id="screen_stations">
+					Stations
+
+					<div class="stations_holder" id="stations_holder">
+
+					</div>
+				</div>
+				<div class="screen_content" id="screen_edit">
+					Edit
+				</div>
+				<div class="screen_content" id="screen_global_params">
+					Global parameters
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function openRightScreen(button, screenId) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="screen_content" and hide them
+    tabcontent = document.getElementsByClassName("screen_content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="menu_button" and remove the class "active"
+    tablinks = document.getElementsByClassName("menu_button");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(screenId).style.display = "block";
+    button.className += " active";
+	
+	// Button specific actions
+	if (button.id == "perimeter_button") {
+        canvas.removeEventListener('mouseup', drawStation, false);
+		canvas.addEventListener('mouseup', drawPoint, false);
+	}
+	else if(button.id == "stations_button"){
+	    canvas.removeEventListener('mouseup', drawPoint, false);
+	    canvas.addEventListener('mouseup', drawStation, false);
+	}
+	    else {
+		canvas.removeEventListener('mouseup', drawPoint, false);
+        canvas.removeEventListener('mouseup', drawStation, false);
+	}
+}
+
+
+
+class Point {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	getX() {
+		return Math.round(this.x);
+	}
+	
+	getY() {
+		return Math.round(this.y);
+	}
+}
+
+class Drone{
+    constructor(){
+
+	}
+	setX(x){
+        this.x = x;
+	}
+	setY(y){
+	    this.y = y;
+	}
+}
+
+//isaakbormental
+class Station{
+
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+        this.maxDrones = 3;
+        this.droneLanding = 5;
+        this.droneService = 30;
+        this.droneTakeoff = 3;
+        this.drones = [new Drone(this.x + 5, this.y + 5), new Drone(this.x - 5, this.y - 5), new Drone(this.x - 5, this.y + 5)];
+	}
+    getX() {
+        return Math.round(this.x);
+    }
+
+    getY() {
+        return Math.round(this.y);
+    }
+
+}
+function addStation(s){
+    var stationsHolder = document.getElementById("stations_holder");
+    var station = document.createElement("div");
+    station.className = "station";
+    station.id = "station " + stations.length;
+    station.innerHTML = "Station " + stations.length + "</br>X: " + s.getX() + "; Y: " + s.getY() + "</br> Drones: 3";
+    stationsHolder.appendChild(station);
+}
+
+
+function addPoint(p) {
+	var perPointsHolder = document.getElementById("perimeter_points_holder");
+	var point = document.createElement("div");
+	point.className = "perimeter_point";
+	point.id = "perimeter_point_" + perimeter.length;
+	point.innerHTML = "Point " + perimeter.length + "</br>X: " + p.getX() + "; Y: " + p.getY();
+	perPointsHolder.appendChild(point);
+}
+
+
+function popPoint() {
+	var id = "perimeter_point_" + perimeter.length;
+	var p = document.getElementById(id);
+	p.parentNode.removeChild(p);
+	
+	deletedPoints.push(perimeter[perimeter.length - 1]);
+	perimeter.pop();
+	
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	redrawCanvas();
+}
+
+
+function restoreDeletedPoint() {
+	if (deletedPoints.length > 0) {
+		var p = deletedPoints.pop();
+		perimeter.push(p);
+		
+		addPoint(p);
+		
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		redrawCanvas();
+	}
+}
+
+function redrawCanvas() {
+	for (var i = 0; i < perimeter.length; i++) {
+		//alert("X: " + perimeter[i].getX() + "; Y: " + perimeter[i].getY());
+		drawOnCanvas(perimeter[i - 1], perimeter[i]);
+	}
+}
+
+
+function init_canvas() {
+	canvas = document.getElementById('canvas');
+	ctx = canvas.getContext("2d");
+	perimeter = [];
+	deletedPoints = [];
+	stations = [];
+
+	canvas.addEventListener('mouseup', drawPoint, false);
+}
+    
+
+function drawOnCanvas(prevPoint, point) {
+	var x = point.getX();
+	var y = point.getY();
+
+	// Draw a point
+	ctx.fillRect(x, y, 2, 2);
+	
+	// Link previous and current points with line
+	if (prevPoint != null) {
+		ctx.beginPath();
+		ctx.moveTo(prevPoint.getX(), prevPoint.getY());
+		ctx.lineTo(x, y);
+		ctx.strokeStyle = "black";
+		ctx.stroke();
+	}
+}
+	
+	
+function drawPoint(evt) {
+	deletedPoints.length = 0;
+	
+	var rect = canvas.getBoundingClientRect();
+	var x = evt.clientX - rect.left;
+	var y = evt.clientY - rect.top;
+	
+	let p = new Point(x, y);
+	if (perimeter.length > 0) {
+		drawOnCanvas(perimeter[perimeter.length - 1], p);
+	} else {
+		drawOnCanvas(null, p);
+	}
+	
+	perimeter.push(p);
+	
+	// Show added point on the panel
+	addPoint(p);
+}
+
+function drawStation(evta){
+    var rect = canvas.getBoundingClientRect();
+    var x = evta.clientX - rect.left;
+    var y = evta.clientY - rect.top;
+
+    let station = new Station(x, y);
+
+
+    // Draw a point
+//    ctx.arc(x, y, 5,0,2*Math.PI);
+//    ctx.fill();
+	ctx.fillRect(x, y, 5, 5);
+
+    stations.push(station);
+
+    // Show added stations on the panel
+    addStation(station);
+}
+
+
+
+    
+/** Init */
+init_canvas();
+</script>
 </body>
-
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
-</template>
-
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
-  </ul>
-</template>
