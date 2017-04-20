@@ -1,7 +1,7 @@
 # Logs
 logs
 *.log
-npm-debug.log*
+npm-debug.log
 
 # Runtime data
 pids
@@ -42,3 +42,6 @@ settings-production.json
 # macOS stuff
 .DS_Store
 *.DS_Store
+
+# IDEA stuff
+.idea
