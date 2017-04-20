@@ -82,12 +82,14 @@ function openRightScreen(button, screenId) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(screenId).style.display = "block";
     button.className += " active";
-	
+
 	// Button specific actions
 	if (button.id == "perimeter_button") {
+	    //Nikitos (only removeListener function)
         canvas.removeEventListener('mouseup', drawStation, false);
 		canvas.addEventListener('mouseup', drawPoint, false);
 	}
+	//Nikitos
 	else if(button.id == "stations_button"){
 	    canvas.removeEventListener('mouseup', drawPoint, false);
 	    canvas.addEventListener('mouseup', drawStation, false);
@@ -105,16 +107,16 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	getX() {
 		return Math.round(this.x);
 	}
-	
+
 	getY() {
 		return Math.round(this.y);
 	}
 }
-
+//Nikitos
 class Drone{
     constructor(){
 
@@ -127,7 +129,7 @@ class Drone{
 	}
 }
 
-//isaakbormental
+//Nikitos
 class Station{
 
     constructor(x, y){
@@ -148,6 +150,8 @@ class Station{
     }
 
 }
+
+//Nikitos
 function addStation(s){
     var stationsHolder = document.getElementById("stations_holder");
     var station = document.createElement("div");
@@ -172,10 +176,10 @@ function popPoint() {
 	var id = "perimeter_point_" + perimeter.length;
 	var p = document.getElementById(id);
 	p.parentNode.removeChild(p);
-	
+
 	deletedPoints.push(perimeter[perimeter.length - 1]);
 	perimeter.pop();
-	
+
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	redrawCanvas();
 }
@@ -185,9 +189,9 @@ function restoreDeletedPoint() {
 	if (deletedPoints.length > 0) {
 		var p = deletedPoints.pop();
 		perimeter.push(p);
-		
+
 		addPoint(p);
-		
+
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		redrawCanvas();
 	}
@@ -210,7 +214,7 @@ function init_canvas() {
 
 	canvas.addEventListener('mouseup', drawPoint, false);
 }
-    
+
 
 function drawOnCanvas(prevPoint, point) {
 	var x = point.getX();
@@ -218,7 +222,7 @@ function drawOnCanvas(prevPoint, point) {
 
 	// Draw a point
 	ctx.fillRect(x, y, 2, 2);
-	
+
 	// Link previous and current points with line
 	if (prevPoint != null) {
 		ctx.beginPath();
@@ -228,28 +232,29 @@ function drawOnCanvas(prevPoint, point) {
 		ctx.stroke();
 	}
 }
-	
-	
+
+
 function drawPoint(evt) {
 	deletedPoints.length = 0;
-	
+
 	var rect = canvas.getBoundingClientRect();
 	var x = evt.clientX - rect.left;
 	var y = evt.clientY - rect.top;
-	
+
 	let p = new Point(x, y);
 	if (perimeter.length > 0) {
 		drawOnCanvas(perimeter[perimeter.length - 1], p);
 	} else {
 		drawOnCanvas(null, p);
 	}
-	
+
 	perimeter.push(p);
-	
+
 	// Show added point on the panel
 	addPoint(p);
 }
 
+//Nikitos
 function drawStation(evta){
     var rect = canvas.getBoundingClientRect();
     var x = evta.clientX - rect.left;
@@ -271,7 +276,7 @@ function drawStation(evta){
 
 
 
-    
+
 /** Init */
 init_canvas();
 </script>
