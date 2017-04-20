@@ -46,6 +46,11 @@
 				</div>
 				<div class="screen_content" id="screen_stations">
 					Stations
+
+					<div class="stations_holder" id="stations_holder">
+
+					</div>
+
 				</div>
 				<div class="screen_content" id="screen_edit">
 					Edit
@@ -78,14 +83,23 @@ function openRightScreen(button, screenId) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(screenId).style.display = "block";
     button.className += " active";
-	
+  
 	// Button specific actions
 	if (button.id == "perimeter_button") {
+	  //Nikitos (only removeListener function)
+    canvas.removeEventListener('mouseup', drawStation, false);
 		canvas.addEventListener('mouseup', drawPoint, false);
-		redrawCanvas(false);
+    redrawCanvas(false);
+	}
+	//Nikitos
+	else if(button.id == "stations_button"){
+	  canvas.removeEventListener('mouseup', drawPoint, false);
+	  canvas.addEventListener('mouseup', drawStation, false);
+    redrawCanvas(false);
 	} else {
 		canvas.removeEventListener('mouseup', drawPoint, false);
-		redrawCanvas(true);
+    canvas.removeEventListener('mouseup', drawStation, false);
+    redrawCanvas(true);
 	}
 }
 
@@ -96,15 +110,61 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
-	
+  
 	getX() {
 		return Math.round(this.x);
 	}
-	
+
 	getY() {
 		return Math.round(this.y);
 	}
 }
+  
+//Nikitos
+class Drone{
+    constructor(){
+
+	}
+	setX(x){
+        this.x = x;
+	}
+	setY(y){
+	    this.y = y;
+	}
+}
+
+//Nikitos
+class Station{
+
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+        this.maxDrones = 3;
+        this.droneLanding = 5;
+        this.droneService = 30;
+        this.droneTakeoff = 3;
+        this.drones = [new Drone(this.x + 5, this.y + 5), new Drone(this.x - 5, this.y - 5), new Drone(this.x - 5, this.y + 5)];
+	}
+    getX() {
+        return Math.round(this.x);
+    }
+
+    getY() {
+        return Math.round(this.y);
+    }
+
+}
+
+//Nikitos
+function addStation(s){
+    var stationsHolder = document.getElementById("stations_holder");
+    var station = document.createElement("div");
+    station.className = "station";
+    station.id = "station " + stations.length;
+    station.innerHTML = "Station " + stations.length + "</br>X: " + s.getX() + "; Y: " + s.getY() + "</br> Drones: 3";
+    stationsHolder.appendChild(station);
+}
+
 
 /** Adds perimeter's point on canvas*/
 function addPoint(p) {
@@ -116,18 +176,20 @@ function addPoint(p) {
 	perPointsHolder.appendChild(point);
 }
 
+
 /** Deletes the last point and pushes it on the deleted points' stack */
 function popPoint() {
 	var id = "perimeter_point_" + perimeter.length;
 	var p = document.getElementById(id);
 	p.parentNode.removeChild(p);
-	
+  
 	deletedPoints.push(perimeter[perimeter.length - 1]);
 	perimeter.pop();
 	
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	redrawCanvas();
 }
+
 
 /** Restores deleted point */
 function restoreDeletedPoint() {
@@ -184,7 +246,8 @@ function init_canvas() {
 	ctx = canvas.getContext("2d");
 	perimeter = [];
 	deletedPoints = [];
-
+	stations = [];
+  
 	canvas.addEventListener('mouseup', drawPoint, false);
 }
     
@@ -195,6 +258,7 @@ function drawOnCanvas(point) {
 
 	// Draw a point
 	ctx.fillRect(x, y, 2, 2);
+
 }
 	
 /** Draw perimeter event handler */
@@ -218,9 +282,27 @@ function drawPoint(evt) {
 	addPoint(p);
 }
 
+//Nikitos
+function drawStation(evta){
+    var rect = canvas.getBoundingClientRect();
+    var x = evta.clientX - rect.left;
+    var y = evta.clientY - rect.top;
+
+    let station = new Station(x, y);
 
 
-    
+    // Draw a point
+//    ctx.arc(x, y, 5,0,2*Math.PI);
+//    ctx.fill();
+	ctx.fillRect(x, y, 5, 5);
+
+    stations.push(station);
+
+    // Show added stations on the panel
+    addStation(station);
+}
+
+
 /** Init */
 init_canvas();
 </script>
