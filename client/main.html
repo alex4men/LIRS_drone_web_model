@@ -50,6 +50,7 @@
 					<div class="stations_holder" id="stations_holder">
 
 					</div>
+
 				</div>
 				<div class="screen_content" id="screen_edit">
 					Edit
@@ -82,21 +83,23 @@ function openRightScreen(button, screenId) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(screenId).style.display = "block";
     button.className += " active";
-
+  
 	// Button specific actions
 	if (button.id == "perimeter_button") {
-	    //Nikitos (only removeListener function)
-        canvas.removeEventListener('mouseup', drawStation, false);
+	  //Nikitos (only removeListener function)
+    canvas.removeEventListener('mouseup', drawStation, false);
 		canvas.addEventListener('mouseup', drawPoint, false);
+    redrawCanvas(false);
 	}
 	//Nikitos
 	else if(button.id == "stations_button"){
-	    canvas.removeEventListener('mouseup', drawPoint, false);
-	    canvas.addEventListener('mouseup', drawStation, false);
-	}
-	    else {
+	  canvas.removeEventListener('mouseup', drawPoint, false);
+	  canvas.addEventListener('mouseup', drawStation, false);
+    redrawCanvas(false);
+	} else {
 		canvas.removeEventListener('mouseup', drawPoint, false);
-        canvas.removeEventListener('mouseup', drawStation, false);
+    canvas.removeEventListener('mouseup', drawStation, false);
+    redrawCanvas(true);
 	}
 }
 
@@ -107,7 +110,7 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
-
+  
 	getX() {
 		return Math.round(this.x);
 	}
@@ -116,6 +119,7 @@ class Point {
 		return Math.round(this.y);
 	}
 }
+  
 //Nikitos
 class Drone{
     constructor(){
@@ -162,6 +166,7 @@ function addStation(s){
 }
 
 
+/** Adds perimeter's point on canvas*/
 function addPoint(p) {
 	var perPointsHolder = document.getElementById("perimeter_points_holder");
 	var point = document.createElement("div");
@@ -172,56 +177,37 @@ function addPoint(p) {
 }
 
 
+/** Deletes the last point and pushes it on the deleted points' stack */
 function popPoint() {
 	var id = "perimeter_point_" + perimeter.length;
 	var p = document.getElementById(id);
 	p.parentNode.removeChild(p);
-
+  
 	deletedPoints.push(perimeter[perimeter.length - 1]);
 	perimeter.pop();
-
+	
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	redrawCanvas();
 }
 
 
+/** Restores deleted point */
 function restoreDeletedPoint() {
 	if (deletedPoints.length > 0) {
 		var p = deletedPoints.pop();
 		perimeter.push(p);
-
+		
 		addPoint(p);
-
+		
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		redrawCanvas();
 	}
 }
 
-function redrawCanvas() {
-	for (var i = 0; i < perimeter.length; i++) {
-		//alert("X: " + perimeter[i].getX() + "; Y: " + perimeter[i].getY());
-		drawOnCanvas(perimeter[i - 1], perimeter[i]);
-	}
-}
-
-
-function init_canvas() {
-	canvas = document.getElementById('canvas');
-	ctx = canvas.getContext("2d");
-	perimeter = [];
-	deletedPoints = [];
-	stations = [];
-
-	canvas.addEventListener('mouseup', drawPoint, false);
-}
-
-
-function drawOnCanvas(prevPoint, point) {
+/** Draws perimeter */
+function drawPerimeter(prevPoint, point) {
 	var x = point.getX();
 	var y = point.getY();
-
-	// Draw a point
-	ctx.fillRect(x, y, 2, 2);
 
 	// Link previous and current points with line
 	if (prevPoint != null) {
@@ -234,22 +220,64 @@ function drawOnCanvas(prevPoint, point) {
 }
 
 
+/** Redraws canvas, linking all perimeter's points */
+function redrawCanvas(needToDrawPerimeter) {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	for (var i = 0; i < perimeter.length; i++) {
+		//alert("X: " + perimeter[i].getX() + "; Y: " + perimeter[i].getY());
+		drawOnCanvas(perimeter[i]);
+		
+		if (needToDrawPerimeter == true) {
+			var point = perimeter[i];
+			var prevPoint = perimeter[i - 1];
+			if (i == 0) {
+				prevPoint = perimeter[perimeter.length - 1];
+			}
+			drawPerimeter(prevPoint, point);			
+		}
+	}
+}
+
+
+/** initializes canvas and all necessary global variables */
+function init_canvas() {
+	canvas = document.getElementById('canvas');
+	ctx = canvas.getContext("2d");
+	perimeter = [];
+	deletedPoints = [];
+	stations = [];
+  
+	canvas.addEventListener('mouseup', drawPoint, false);
+}
+    
+/** Draws point on canvas */
+function drawOnCanvas(point) {
+	var x = point.getX();
+	var y = point.getY();
+
+	// Draw a point
+	ctx.fillRect(x, y, 2, 2);
+
+}
+	
+/** Draw perimeter event handler */
 function drawPoint(evt) {
 	deletedPoints.length = 0;
-
+	
 	var rect = canvas.getBoundingClientRect();
 	var x = evt.clientX - rect.left;
 	var y = evt.clientY - rect.top;
-
+	
 	let p = new Point(x, y);
 	if (perimeter.length > 0) {
-		drawOnCanvas(perimeter[perimeter.length - 1], p);
+		drawOnCanvas(p);
 	} else {
-		drawOnCanvas(null, p);
+		drawOnCanvas(p);
 	}
-
+	
 	perimeter.push(p);
-
+	
 	// Show added point on the panel
 	addPoint(p);
 }
@@ -273,8 +301,6 @@ function drawStation(evta){
     // Show added stations on the panel
     addStation(station);
 }
-
-
 
 
 /** Init */
