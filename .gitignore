@@ -42,3 +42,6 @@ settings-production.json
 # macOS stuff
 .DS_Store
 *.DS_Store
+
+# IDEA stuff
+.idea
