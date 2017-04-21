@@ -1,109 +1,76 @@
 <head>
-  <title>Drones</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+	<title>Drones</title>
+	
+	<!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
 
-<div class="main_block">
-    <div class="header">
-        <h2> DRONES </h2>
+<nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Drones</a>
     </div>
+</nav>
 
-	<div class="main_frame">
-		<canvas id="canvas" width="498px" height="498px">
-		</canvas>
-		
-		<div class="right_panel">
-			<div class="menu">
-				<div class="menu_button active" id="perimeter_button" onclick="openRightScreen(this, 'screen_perimeter');">
-					<span class="menu_button_text">Perimeter</span>
-				</div>
-				<div class="menu_button" id="stations_button" onclick="openRightScreen(this, 'screen_stations');">
-					<span class="menu_button_text">Stations</span>
-				</div>
-				<div class="menu_button" id="edit_button" onclick="openRightScreen(this, 'screen_edit');">
-					<span class="menu_button_text">Edit</span>
-				</div>
-				<div class="menu_button" id="global_params_button" onclick="openRightScreen(this, 'screen_global_params');">
-					<span class="menu_button_text">Global Params</span>
-				</div>
-			</div>
-			
-			<div class="right_panel_screen">
-				<div class="screen_content" id="screen_perimeter" style="display: block;">
-					<span>Perimeter</span>
-					<div class="perimeter_menu">
-						<div class="perimeter_menu_button" id="perimeter_undo" onclick="popPoint();">
-							&#8592; undo
+<div class="container" style="width: 90%">
+    <div class="section">
+        <div class="row">
+            <div class="col s7">
+				<canvas id="canvas" width="498px" height="498px"></canvas>
+            </div>
+            <div class="col s5">
+                <div class="card" style="margin-top: 0px;">
+                    <div class="card-tabs">
+                        <ul class="tabs tabs-fixed-width">
+                            <li class="tab"><a class="active" href="#perimeter" id="perimeter_button">Perimeter</a></li>
+                            <li class="tab"><a href="#stations" id="stations_button">Stations</a></li>
+                            <li class="tab"><a href="#map" id="screen_edit">Edit</a></li>
+							<li class="tab"><a href="#global-params" id="screen_global_params">Global params</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-content grey lighten-4">
+                        <div id="perimeter">
+							<div class="screen_content" id="screen_perimeter" style="display: block;">
+								<span>Perimeter</span>
+								<div class="perimeter_menu">
+									<a class="waves-effect waves-light btn" id="perimeter_undo" onclick="popPoint();"><i class="material-icons left">skip_previous</i>Undo</a>
+									<a class="waves-effect waves-light btn" id="perimeter_redo" onclick="restoreDeletedPoint();"><i class="material-icons left">skip_next</i>Redo</a>
+								</div>
+								<ul class="collection" id="perimeter_points_holder"></ul>
+							</div>
+                        </div>
+						<div id="stations">
+							<ul class="collection" id="stations_holder"></ul>
 						</div>
-						<div class="perimeter_menu_button" id="perimeter_redo" onclick="restoreDeletedPoint();">
-							redo &#8594;
-						</div>
-					</div>
-					<div class="perimeter_points_holder" id="perimeter_points_holder">
-						
 					</div>
 				</div>
-				<div class="screen_content" id="screen_stations">
-					Stations
-
-					<div class="stations_holder" id="stations_holder">
-
-					</div>
-
-				</div>
-				<div class="screen_content" id="screen_edit">
-					Edit
-				</div>
-				<div class="screen_content" id="screen_global_params">
-					Global parameters
-				</div>
-			</div>
+			</div>                            
 		</div>
 	</div>
 </div>
 
+<footer class="page-footer bottom-sheet orange">
+    <div class="footer-copyright">
+        <div class="container">
+            Made by LIRS
+        </div>
+    </div>
+</footer>
+
 <script>
-function openRightScreen(button, screenId) {
-    // Declare all variables
-    var i, tabcontent, tablinks;
+$('#perimeter_button').click(function() {
+	canvas.removeEventListener('mouseup', drawStation, false);
+	canvas.addEventListener('mouseup', drawPoint, false);
+	redrawCanvas(false);
+});
 
-    // Get all elements with class="screen_content" and hide them
-    tabcontent = document.getElementsByClassName("screen_content");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-
-    // Get all elements with class="menu_button" and remove the class "active"
-    tablinks = document.getElementsByClassName("menu_button");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    // Show the current tab, and add an "active" class to the link that opened the tab
-    document.getElementById(screenId).style.display = "block";
-    button.className += " active";
-  
-	// Button specific actions
-	if (button.id == "perimeter_button") {
-	    //Nikitos (only removeListener function)
-        canvas.removeEventListener('mouseup', drawStation, false);
-		canvas.addEventListener('mouseup', drawPoint, false);
-        redrawCanvas(false);
-	}
-	//Nikitos
-	else if(button.id == "stations_button"){
-	    canvas.removeEventListener('mouseup', drawPoint, false);
-	    canvas.addEventListener('mouseup', drawStation, false);
-        redrawCanvas(true);
-	} else {
-		canvas.removeEventListener('mouseup', drawPoint, false);
-		canvas.removeEventListener('mouseup', drawStation, false);
-		redrawCanvas(true);
-	}
-}
-
-
+$('#stations_button').click(function() {
+	canvas.removeEventListener('mouseup', drawPoint, false);
+	canvas.addEventListener('mouseup', drawStation, false);
+	redrawCanvas(true);
+});
 
 class Point {
 	constructor(x, y) {
@@ -157,23 +124,26 @@ class Station{
 
 //Nikitos
 function addStation(s){
-    var stationsHolder = document.getElementById("stations_holder");
-    var station = document.createElement("div");
-    station.className = "station";
-    station.id = "station " + stations.length;
-    station.innerHTML = "Station " + stations.length + "</br>X: " + s.getX() + "; Y: " + s.getY() + "</br> Drones: 3";
-    stationsHolder.appendChild(station);
+    var station = $('<li class="collection-item avatar" id="station' + stations.length + '">'
+					+'<i class="material-icons circle green">loop</i>'
+					+'<span class="title">Station' + stations.length + '</span>'
+					+'<p>X:' + s.getX() + '; Y:'+ s.getY() +';'
+						+'<br/>'
+						+'Drones: 3'
+					+'</p>'
+				+'</li>');
+	$('#stations_holder').append(station);
 }
 
 
 /** Adds perimeter's point on canvas*/
 function addPoint(p) {
-	var perPointsHolder = document.getElementById("perimeter_points_holder");
-	var point = document.createElement("div");
-	point.className = "perimeter_point";
-	point.id = "perimeter_point_" + perimeter.length;
-	point.innerHTML = "Point " + perimeter.length + "</br>X: " + p.getX() + "; Y: " + p.getY();
-	perPointsHolder.appendChild(point);
+	var point = $('<li class="collection-item avatar" id="perimeter_point_' + perimeter.length + '">'
+					+'<i class="material-icons circle green">navigation</i>'
+					+'<span class="title">Point' + perimeter.length + '</span>'
+					+'<p>X:' + p.getX() + '; Y:'+ p.getY() +';</p>'
+				+'</li>');
+	$('#perimeter_points_holder').append(point);
 }
 
 
