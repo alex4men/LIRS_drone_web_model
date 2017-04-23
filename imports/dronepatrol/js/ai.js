@@ -207,7 +207,6 @@ DronePatrol.prototype.Target.prototype.get_closest_station = function(stations) 
         let h = station.position.y - this.position.y;
         let l = station.position.x - this.position.x;
         let distance = Math.sqrt(h*h + l*l);
-
         if (distance < min && station.drones_in_dock > 0) {
             min = distance;
             nearestStation = station;

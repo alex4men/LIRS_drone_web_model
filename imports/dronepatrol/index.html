@@ -2,178 +2,34 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Drone patrol</title>
+        <title>Drones 2K17</title>
+        <link rel="stylesheet" href="css/style.css">
+        <script src="js/d3.v4.js"></script>
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/graham.js"></script>
     </head>
     <body>
-        <canvas id="myCanvas" resize width="2000px" height="2000px"></canvas>
-
-        <script
-          src="https://code.jquery.com/jquery-3.2.1.min.js"
-          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-          crossorigin="anonymous"></script>
-
-        <script src="js/classes.js" charset="utf-8"></script>
-        <script src="js/dat/dat.gui.min.js" charset="utf-8"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.3/paper-full.min.js" charset="utf-8"></script>
-
-        <script type="text/paperscript" canvas="myCanvas">
-            var canvas = document.getElementById('myCanvas'),
-                context = canvas.getContext('2d');
-            window.addEventListener('resize', resizeCanvas, false);
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resizeCanvas();
-            //#########################################
-            var settings = {
-                speed: 6,
-                droneSpeed: 10,
-            };
-            var gui = new dat.gui.GUI();
-            gui.remember(settings);
-            gui.add(settings, 'speed').min(1).max(20).step(1);
-            gui.add(settings, 'droneSpeed').min(1).max(100).step(1);
-
-
-
-            //#########################################
-
-
-            var BATTERY_CAPACITY = 55;
-
-            var wh = window.innerHeight;
-            var hl = window.innerWidth;
-
-            var c1 = (hl - wh * 0.8) / 2;
-            var c2 = c1 + wh * 0.8;
-            var c3 = wh * 0.1;
-            var c4 = wh * 0.9;
-
-
-            var dp = new DronePatrol();
-
-            var end = new dp.Position(1200, 300);
-
-            // target
-            var target = new dp.Target(new dp.Position(200, 200), 5);
-            target.marker = new Path.Circle(new Point(
-                target.position.x,
-                target.position.y
-            ), 5);
-
-            // territory
-            var pillars = [
-                new dp.Position(c1, c3),
-                new dp.Position(c2, c3),
-                new dp.Position(c2, c4),
-                new dp.Position(c1, c4),
-            ]
-            var territory = new dp.Territory(pillars);
-            var path = new Path();
-            path.strokeColor = 'black';
-            for (var i = 0; i < territory.pillars.length; i++) {
-                var pillar = territory.pillars[i];
-                path.add(new Point(pillar.x, pillar.y))
-            }
-            path.closed = true;
-
-            // drones
-            var gdrones = []
-            var stations = []
-            for (var i = 0; i < 2; i++) {
-                var drones = []
-
-                var x = Math.random() * (c2 - c1) + c1;
-                var y = Math.random() * (c4 - c3) + c3;
-
-                for (var j = 0; j < 3; j++) {
-                    var drone = new dp.Drone(new dp.Position(x, y), settings.droneSpeed, BATTERY_CAPACITY);
-                    drone.marker = new Path.Circle(new Point(
-                        drone.position.x,
-                        drone.position.y
-                    ), 5);
-                    drone.marker.fillColor = 'blue';
-
-                    drones.push(drone);
-                    gdrones.push(drone);
-                }
-
-                var station = new dp.Station(new dp.Position(x,y), drones);
-                station.marker = new Path.Circle(new Point(
-                    station.position.x,
-                    station.position.y
-                ), 15);
-                station.marker.fillColor = 'green';
-
-                stations.push(station);
-            }
-
-            var count = 0;
-            function onFrame(event) {
-                count++;
-                if (count % settings.speed === 0) {
-                    // target random walk
-                    if (target.is_goal_reached(end)) {
-                        var x = Math.random() * (hl - 0) + 0;
-                        var y = Math.random() * (wh - 0) + 0;
-
-                        end = new dp.Position(x, y);
-                    }
-                    target.move_to(end);
-                    target.marker.position.x = target.position.x;
-                    target.marker.position.y = target.position.y;
-                    target.marker.fillColor = territory.is_inside(target) ? 'red':'yellow';
-
-                    // drone watchers
-                    var watcher_drone = target.followed_by
-                    if (territory.is_inside(target)) {
-                        if (!watcher_drone) {
-                            watcher_drone = target.get_closest_station(stations).get_drone();
-                        }
-
-                        if (!watcher_drone.enough_battery(stations)) {
-                            var cs = watcher_drone.get_closest_station(stations);
-                            var switch_drone = cs.get_drone();
-                            watcher_drone.target = cs;
-                            cs.add_drone(watcher_drone);
-
-                            watcher_drone = switch_drone;
-                        } else {
-                            watcher_drone.target = target;
-                        }
-
-                        target.followed_by = watcher_drone;
-
-                    } else {
-                        if (watcher_drone) {
-                            var station = watcher_drone.get_closest_station_for_land(stations);
-                            watcher_drone.target = station;
-                            station.add_drone(watcher_drone);
-                            target.followed_by = null;
-                        }
-                    }
-
-                    for (var i = 0; i < gdrones.length; i++) {
-                        var gd = gdrones[i];
-
-                        if (gd.target) {
-                            gd.pursue();
-                            gd.speed = settings.droneSpeed;
-                            gd.marker.position.x = gd.position.x;
-                            gd.marker.position.y = gd.position.y;
-
-                            // hack for checking whether it is a station
-                            if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
-                                gd.capacity = BATTERY_CAPACITY;
-                            }
-                        }
-                    }
-
-
-                }
-            }
-
-        </script>
+        <div id="area" width="800" height="800"></div>
     </body>
+
+    <script src="js/utils.js" charset="utf-8"></script>
+    <script src="js/ai.js" charset="utf-8"></script>
+    <script src="js/gui.js" charset="utf-8"></script>
+    <script src="js/api.js" charset="utf-8"></script>
+    <script src="js/dat/dat.gui.min.js" charset="utf-8"></script>
+
+    <script type="text/javascript">
+
+        //#########################################
+        var settings = {
+            speed: 6,
+            droneSpeed: 10,
+        };
+        var gui = new dat.gui.GUI();
+        gui.remember(settings);
+        gui.add(settings, 'speed').min(1).max(20).step(1);
+        gui.add(settings, 'droneSpeed').min(1).max(100).step(1);
+
+        //#########################################
+    </script>
 </html>
