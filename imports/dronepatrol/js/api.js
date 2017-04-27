@@ -1,4 +1,4 @@
-let area = new GUI(800);
+var area = new GUI(800);
 var dp = new DronePatrol();
 
 $("#area").click(function() {
