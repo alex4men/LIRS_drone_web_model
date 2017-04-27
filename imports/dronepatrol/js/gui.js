@@ -203,20 +203,24 @@ class GUI {
 
 
     // drones
+    var gdrones = []
     for (let i = 0, len = area.stations.length; i < len; i++) {
       var drones = [];
       for (var j = 0; j < 3; j++) {
-        var drone = new dp.Drone(new dp.Position(area.stations[i].x, area.stations[i].y), settings.droneSpeed, BATTERY_CAPACITY);
+        var drone = new dp.Drone(new dp.Position(area.stations[i].position.x, area.stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
         drone.marker = area.field
         .append("circle")
         .attr("cx", area.stations[i].position.x + area.rect_size / 2)
         .attr("cy", area.stations[i].position.y + area.rect_size / 2)
         .attr("r", 10)
         .style("fill", "blue");
-        drones.push(drone);
+        drones.push(drone)
+        gdrones.push(drone)
       }
       area.stations[i].drones = drones;
       area.stations[i].drones_in_dock = drones.length;
+
+      // console.log(area.stations[i].drones);
     }
 
     target.move_to(end);
@@ -241,6 +245,7 @@ class GUI {
       if (coordsAreInside([target.position.x, target.position.y], area.hullPoints)) {
         if (!watcher_drone) {
           watcher_drone = target.get_closest_station(area.stations).get_drone();
+          console.log(watcher_drone);
         }
 
         if (!watcher_drone.enough_battery(area.stations)) {

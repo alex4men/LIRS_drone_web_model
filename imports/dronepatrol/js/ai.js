@@ -84,7 +84,6 @@ DronePatrol.prototype.Drone.prototype.get_closest_station = function(stations) {
 DronePatrol.prototype.Drone.prototype.get_closest_station_for_land = function(stations) {
     let min = 99999999999999999;
     let nearestStation = null;
-
     for (var i = 0; i < stations.length; i++) {
         let station = stations[i];
         let h = station.position.y - this.position.y;
