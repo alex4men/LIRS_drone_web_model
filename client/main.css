@@ -1,5 +1,28 @@
 /** Elements */
-#canvas {
+
+#area {
+    border: 3px solid #fca15c;
+    margin: 30px;
+    width: 800px;
+    height: 800px;
+}
+
+svg {
+    position: relative;
+
+}
+
+.vertex {
+	position: absolute;
+	transform: translate(-50%, -50%);
+}
+
+.station {
+	fill: blue;
+	transform: translate(-50%, -50%);
+
+}
+/*#canvas {
 	height: 498px;
 	width: 498px;
 	border: solid white 1px;
@@ -43,4 +66,4 @@
 	box-shadow: 0 1px 1px rgba(0,0,0,.1);
 	text-align: center;
 	color: black;
-}
+}*/

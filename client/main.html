@@ -1,284 +1,62 @@
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
 	<title>Drones</title>
 	
 	<!-- CSS  -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://d3js.org/d3.v4.js"></script>
 </head>
 
 <body>
 
-<nav class="light-blue lighten-1" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Drones</a>
-    </div>
-</nav>
+	<nav class="light-blue lighten-1" role="navigation">
+	    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Drones</a>
+	    </div>
+	</nav>
 
-<div class="container" style="width: 90%">
-    <div class="section">
-        <div class="row">
-            <div class="col s7">
-				<canvas id="canvas" width="498px" height="498px"></canvas>
-            </div>
-            <div class="col s5">
-                <div class="card" style="margin-top: 0px;">
-                    <div class="card-tabs">
-                        <ul class="tabs tabs-fixed-width">
-                            <li class="tab"><a class="active" href="#perimeter" id="perimeter_button">Perimeter</a></li>
-                            <li class="tab"><a href="#stations" id="stations_button">Stations</a></li>
-                            <li class="tab"><a href="#map" id="screen_edit">Edit</a></li>
-							<li class="tab"><a href="#global-params" id="screen_global_params">Global params</a></li>
-                        </ul>
-                    </div>
-                    <div class="card-content grey lighten-4">
-                        <div id="perimeter">
-							<div class="screen_content" id="screen_perimeter" style="display: block;">
-								<span>Perimeter</span>
-								<div class="perimeter_menu">
-									<a class="waves-effect waves-light btn" id="perimeter_undo" onclick="popPoint();"><i class="material-icons left">skip_previous</i>Undo</a>
-									<a class="waves-effect waves-light btn" id="perimeter_redo" onclick="restoreDeletedPoint();"><i class="material-icons left">skip_next</i>Redo</a>
+	<div class="container" style="width: 90%">
+	    <div class="section">
+	        <div class="row">
+	            <div class="col s7">
+	            	
+	            	{{> area}}
+
+	            </div>
+	            <div class="col s5">
+	                <div class="card" style="margin-top: 0px;">
+	                    <div class="card-tabs">
+	                        <ul class="tabs tabs-fixed-width">
+	                            <li class="tab"><a class="active" href="#perimeter" id="perimeter_button">Perimeter</a></li>
+	                            <li class="tab"><a href="#stations" id="stations_button">Stations</a></li>
+	                            <li class="tab"><a href="#map" id="screen_edit">Edit</a></li>
+								<li class="tab"><a href="#global-params" id="screen_global_params">Global params</a></li>
+	                        </ul>
+	                    </div>
+	                    <div class="card-content grey lighten-4">
+	                        <div id="perimeter">
+								<div class="screen_content" id="screen_perimeter" style="display: block;">
+									<span>Perimeter</span>
+									<div class="perimeter_menu">
+										<a class="waves-effect waves-light btn" id="perimeter_undo" onclick="popPoint();"><i class="material-icons left">skip_previous</i>Undo</a>
+										<a class="waves-effect waves-light btn" id="perimeter_redo" onclick="restoreDeletedPoint();"><i class="material-icons left">skip_next</i>Redo</a>
+									</div>
+									<ul class="collection" id="perimeter_points_holder"></ul>
 								</div>
-								<ul class="collection" id="perimeter_points_holder"></ul>
+	                        </div>
+							<div id="stations">
+								<ul class="collection" id="stations_holder"></ul>
 							</div>
-                        </div>
-						<div id="stations">
-							<ul class="collection" id="stations_holder"></ul>
 						</div>
 					</div>
-				</div>
-			</div>                            
+				</div>                            
+			</div>
 		</div>
 	</div>
-</div>
 
-<footer class="page-footer bottom-sheet orange">
-    <div class="footer-copyright">
-        <div class="container">
-            Made by LIRS
-        </div>
-    </div>
-</footer>
-
-<script>
-$('#perimeter_button').click(function() {
-	canvas.removeEventListener('mouseup', drawStation, false);
-	canvas.addEventListener('mouseup', drawPoint, false);
-	redrawCanvas(false);
-});
-
-$('#stations_button').click(function() {
-	canvas.removeEventListener('mouseup', drawPoint, false);
-	canvas.addEventListener('mouseup', drawStation, false);
-	redrawCanvas(true);
-});
-
-class Point {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-  
-	getX() {
-		return Math.round(this.x);
-	}
-
-	getY() {
-		return Math.round(this.y);
-	}
-}
-  
-//Nikitos
-class Drone{
-    constructor(){
-
-	}
-	setX(x){
-        this.x = x;
-	}
-	setY(y){
-	    this.y = y;
-	}
-}
-
-//Nikitos
-class Station{
-
-    constructor(x, y){
-        this.x = x;
-        this.y = y;
-        this.maxDrones = 3;
-        this.droneLanding = 5;
-        this.droneService = 30;
-        this.droneTakeoff = 3;
-        this.drones = [new Drone(this.x + 5, this.y + 5), new Drone(this.x - 5, this.y - 5), new Drone(this.x - 5, this.y + 5)];
-	}
-    getX() {
-        return Math.round(this.x);
-    }
-
-    getY() {
-        return Math.round(this.y);
-    }
-
-}
-
-//Nikitos
-function addStation(s){
-    var station = $('<li class="collection-item avatar" id="station' + stations.length + '">'
-					+'<i class="material-icons circle green">loop</i>'
-					+'<span class="title">Station' + stations.length + '</span>'
-					+'<p>X:' + s.getX() + '; Y:'+ s.getY() +';'
-						+'<br/>'
-						+'Drones: 3'
-					+'</p>'
-				+'</li>');
-	$('#stations_holder').append(station);
-}
-
-
-/** Adds perimeter's point on canvas*/
-function addPoint(p) {
-	var point = $('<li class="collection-item avatar" id="perimeter_point_' + perimeter.length + '">'
-					+'<i class="material-icons circle green">navigation</i>'
-					+'<span class="title">Point' + perimeter.length + '</span>'
-					+'<p>X:' + p.getX() + '; Y:'+ p.getY() +';</p>'
-				+'</li>');
-	$('#perimeter_points_holder').append(point);
-}
-
-
-/** Deletes the last point and pushes it on the deleted points' stack */
-function popPoint() {
-	var id = "perimeter_point_" + perimeter.length;
-	var p = document.getElementById(id);
-	p.parentNode.removeChild(p);
-  
-	deletedPoints.push(perimeter[perimeter.length - 1]);
-	perimeter.pop();
-	
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	redrawCanvas();
-}
-
-
-/** Restores deleted point */
-function restoreDeletedPoint() {
-	if (deletedPoints.length > 0) {
-		var p = deletedPoints.pop();
-		perimeter.push(p);
-		
-		addPoint(p);
-		
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		redrawCanvas();
-	}
-}
-
-/** Draws perimeter */
-function drawPerimeter(prevPoint, point) {
-	var x = point.getX();
-	var y = point.getY();
-
-	// Link previous and current points with line
-	if (prevPoint != null) {
-		ctx.beginPath();
-		ctx.moveTo(prevPoint.getX(), prevPoint.getY());
-		ctx.lineTo(x, y);
-		ctx.strokeStyle = "black";
-		ctx.stroke();
-	}
-}
-
-
-/** Redraws canvas, linking all perimeter's points */
-function redrawCanvas(needToDrawPerimeter) {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	// Redraw perimeter
-	for (var i = 0; i < perimeter.length; i++) {
-		drawOnCanvas(perimeter[i]);
-		
-		if (needToDrawPerimeter == true) {
-			var point = perimeter[i];
-			var prevPoint = perimeter[i - 1];
-			if (i == 0) {
-				prevPoint = perimeter[perimeter.length - 1];
-			}
-			drawPerimeter(prevPoint, point);			
-		}
-	}
-	
-	// Redraw stations
-	for (var j = 0; j < stations.length; j++) {
-		ctx.fillRect(stations[j].getX(), stations[j].getY(), 5, 5);
-	}
-}
-
-
-/** initializes canvas and all necessary global variables */
-function init_canvas() {
-	canvas = document.getElementById('canvas');
-	ctx = canvas.getContext("2d");
-	perimeter = [];
-	deletedPoints = [];
-	stations = [];
-  
-	canvas.addEventListener('mouseup', drawPoint, false);
-}
-    
-/** Draws point on canvas */
-function drawOnCanvas(point) {
-	var x = point.getX();
-	var y = point.getY();
-
-	// Draw a point
-	ctx.fillRect(x, y, 2, 2);
-
-}
-	
-/** Draw perimeter event handler */
-function drawPoint(evt) {
-	deletedPoints.length = 0;
-	
-	var rect = canvas.getBoundingClientRect();
-	var x = evt.clientX - rect.left;
-	var y = evt.clientY - rect.top;
-	
-	let p = new Point(x, y);
-	if (perimeter.length > 0) {
-		drawOnCanvas(p);
-	} else {
-		drawOnCanvas(p);
-	}
-	
-	perimeter.push(p);
-	
-	// Show added point on the panel
-	addPoint(p);
-}
-
-//Nikitos
-function drawStation(evta){
-    var rect = canvas.getBoundingClientRect();
-    var x = evta.clientX - rect.left;
-    var y = evta.clientY - rect.top;
-
-    let station = new Station(x, y);
-
-
-    // Draw a point
-//    ctx.arc(x, y, 5,0,2*Math.PI);
-//    ctx.fill();
-	ctx.fillRect(x, y, 5, 5);
-
-    stations.push(station);
-
-    // Show added stations on the panel
-    addStation(station);
-}
-
-
-/** Init */
-init_canvas();
-</script>
+	<footer class="page-footer bottom-sheet orange">
+	    <div class="footer-copyright">
+	        <div class="container">
+	            Made by LIRS
+	        </div>
+	    </div>
+	</footer>
 </body>

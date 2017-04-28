@@ -1,7 +1,7 @@
 // https://github.com/brian3kb/graham_scan_js
 // http://jsfiddle.net/HYEONGJINKIM/wmcopdko/
 
-function ConvexHullGrahamScan() {
+export function ConvexHullGrahamScan() {
     this.anchorPoint = void 0, this.reverse = !1, this.points = []
 }
 ConvexHullGrahamScan.prototype = {

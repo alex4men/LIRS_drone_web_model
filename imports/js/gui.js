@@ -1,3 +1,7 @@
+import { ConvexHullGrahamScan } from './graham';
+import { mouse, mouseStatus, getRandomInt, getRandomArbitrary } from './utils';
+import { dp } from './ai';
+
 'use strict';
 
 // main class for drawing vertices, edges, paths
@@ -13,7 +17,6 @@ class GUI {
     this.hullPoints = [];
     this.convexHull = new ConvexHullGrahamScan();
     this.field = d3.select('#area').append('svg').attr('width', size).attr('height', size);
-
   }
 
   buildHull() {
@@ -27,35 +30,36 @@ class GUI {
       return;
     }
     var id = +new Date; // timestamp
-    let x = event.pageX - 40 - area.rect_size / 2,
-    y = event.pageY - 30 - area.rect_size / 2;
+    let x = event.pageX - 40 - this.rect_size / 2,
+    y = event.pageY - 30 - this.rect_size / 2;
 
-    area.field.append('rect')
+    this.field.append('rect')
     .attr('id','vertex_'+id)
-    .attr('width', area.rect_size)
-    .attr('height', area.rect_size)
+    .attr('width', this.rect_size)
+    .attr('height', this.rect_size)
     .attr('x', x)
     .attr('y', y)
     .attr('class', 'vertex')
-    .attr('onclick',"area.remVertex('vertex_"+id+"');")
+    .attr('onclick',"remVertex('vertex_"+id+"');")
     .attr('onmouseover', "mouseStatus(true);")
     .attr('onmouseout', "mouseStatus(false);");
+    console.log(this.field);
 
-    area.redraw();
+    this.redraw();
   }
 
   // remVertex(id) - remove vertex with "id" from field
   remVertex(id) {
-    d3.select('#'+id).remove().call(area.redraw);
+    d3.select('#'+id).remove().call(this.redraw);
   }
 
   // getVertices() - get list of vertices coordinates ( [[x1,y1], [x2,y2]] )
   getVertices() {
-    area.vertices = d3.selectAll('.vertex').nodes().map(function (el) {
+    this.vertices = d3.selectAll('.vertex').nodes().map(function (el) {
       return [parseInt(d3.select(el).attr('x')), parseInt(d3.select(el).attr('y'))];
     });
 
-    return area.vertices;
+    return this.vertices;
 
   }
 
@@ -63,17 +67,17 @@ class GUI {
   getEdges() {
     this.edges = []
 
-    if(area.hullPoints.length < 3)
+    if(this.hullPoints.length < 3)
     return null
 
-    for (let i = 0, len = area.hullPoints.length; i < len; i++) {
-      area.edges.push([
-        [parseInt(area.hullPoints[i].x) + area.rect_size / 2, parseInt(area.hullPoints[i].y) + area.rect_size / 2], // start point
-        [parseInt(area.hullPoints[(i + 1) % len].x) + area.rect_size / 2, parseInt(area.hullPoints[(i + 1) % len].y) + area.rect_size / 2] // end point
+    for (let i = 0, len = this.hullPoints.length; i < len; i++) {
+      this.edges.push([
+        [parseInt(this.hullPoints[i].x) + this.rect_size / 2, parseInt(this.hullPoints[i].y) + this.rect_size / 2], // start point
+        [parseInt(this.hullPoints[(i + 1) % len].x) + this.rect_size / 2, parseInt(this.hullPoints[(i + 1) % len].y) + this.rect_size / 2] // end point
       ]);
     }
 
-    return area.edges;
+    return this.edges;
 
   }
 
@@ -82,8 +86,8 @@ class GUI {
     d3.select('#start').remove();
     d3.select('#end').remove();
 
-    let start = area.edges[getRandomInt(0, area.edges.length - 1)]
-    let end   = area.edges[getRandomInt(0, area.edges.length - 1)]
+    let start = this.edges[getRandomInt(0, this.edges.length - 1)]
+    let end   = this.edges[getRandomInt(0, this.edges.length - 1)]
 
     let m1 = (start[1][1] - start[0][1]) / (start[1][0] - start[0][0] + 0.000000001)
     let m2 = (end[1][1] - end[0][1]) / (end[1][0] - end[0][0] + 0.000000001)
@@ -91,23 +95,23 @@ class GUI {
     let t1 = []
     let t2 = []
 
-    t1[0] = getRandomArbitrary(Math.min(start[0][0], start[1][0]), Math.max(start[0][0], start[1][0])) - area.rect_size / 2
-    t1[1] = start[1][1] - m1 * (start[1][0] - t1[0]) - area.rect_size / 2
+    t1[0] = getRandomArbitrary(Math.min(start[0][0], start[1][0]), Math.max(start[0][0], start[1][0])) - this.rect_size / 2
+    t1[1] = start[1][1] - m1 * (start[1][0] - t1[0]) - this.rect_size / 2
 
-    t2[0] = getRandomArbitrary(Math.min(end[0][0], end[1][0]), Math.max(end[0][0], end[1][0])) - area.rect_size / 2
-    t2[1] = end[1][1] - m2 * (end[1][0] - t2[0]) - area.rect_size / 2
+    t2[0] = getRandomArbitrary(Math.min(end[0][0], end[1][0]), Math.max(end[0][0], end[1][0])) - this.rect_size / 2
+    t2[1] = end[1][1] - m2 * (end[1][0] - t2[0]) - this.rect_size / 2
 
-    area.field.append('rect')
-    .attr('width', area.rect_size)
-    .attr('height', area.rect_size)
+    this.field.append('rect')
+    .attr('width', this.rect_size)
+    .attr('height', this.rect_size)
     .attr('x', t1[0])
     .attr('y', t1[1])
     .attr("fill", "green")
     .attr("id", "start")
 
-    area.field.append('rect')
-    .attr('width', area.rect_size)
-    .attr('height', area.rect_size)
+    this.field.append('rect')
+    .attr('width', this.rect_size)
+    .attr('height', this.rect_size)
     .attr('x', t2[0])
     .attr('y', t2[1])
     .attr("fill", "red")
@@ -124,63 +128,65 @@ class GUI {
       return;
     }
     var id = +new Date; // timestamp
-    let x = event.pageX - 40 - area.rect_size / 2,
-    y = event.pageY - 30 - area.rect_size / 2;
+    let x = event.pageX - 40 - this.rect_size / 2,
+    y = event.pageY - 30 - this.rect_size / 2;
 
-    area.field.append('rect')
+    this.field.append('rect')
     .attr('id','station_'+id)
-    .attr('width', area.rect_size)
-    .attr('height', area.rect_size)
+    .attr('width', this.rect_size)
+    .attr('height', this.rect_size)
     .attr('x', x)
     .attr('y', y)
     .attr('fill', 'blue')
     .attr('class', 'station')
-    .attr('oncontextmenu',"area.remStation('station_"+id+"');")
+    .attr('oncontextmenu',"this.remStation('station_"+id+"');")
     .attr('onmouseover', "mouseStatus(true);")
     .attr('onmouseout', "mouseStatus(false);");
 
-    area.stations.push(new dp.Station(new dp.Position(x,y), []));
-    area.redraw();
+    this.stations.push(new dp.Station(new dp.Position(x,y), []));
+    this.redraw();
   }
 
   // remStation(id) - remove station with "id" from field
   remStation(id) {
-    d3.select('#'+id).remove().call(area.redraw);
+    d3.select('#'+id).remove().call(this.redraw);
   }
 
   // getStations() - get list of stations coordinates ( [[x1,y1], [x2,y2]] )
   getStations() {
-    area.stations = d3.selectAll('.station').nodes().map(function (el) {
+    this.stations = d3.selectAll('.station').nodes().map(function (el) {
       return {position : {x: parseInt(d3.select(el).attr('x')), y: parseInt(d3.select(el).attr('y'))}};
     });
 
-    return area.stations;
+    return this.stations;
 
   }
 
   redraw() {
     d3.select("#perimeter").remove();
-    area.vertices   = area.getVertices();
-    area.convexHull = new ConvexHullGrahamScan();
-    area.vertices.map(function (el) {area.convexHull.addPoint(el[0], el[1]); });
-    area.hullPoints = area.convexHull.getHull();
-    area.edges      = area.getEdges();
-    area.path       = ""
+    this.vertices   = this.getVertices();
+    this.convexHull = new ConvexHullGrahamScan();
+    this.vertices.map(function (el) {this.convexHull.addPoint(el[0], el[1]); });
+    this.hullPoints = this.convexHull.getHull();
+    this.edges      = this.getEdges();
+    this.path       = ""
 
-    if (area.hullPoints.length < 3)
+    if (this.hullPoints.length < 3)
     return;
 
-    for (let i = 0, len = area.hullPoints.length; i < len; i++) {
-      area.path += i==0 ? "M" : " L"
-      area.path += " " + (parseInt(area.hullPoints[i].x) + area.rect_size / 2) + " " + (parseInt(area.hullPoints[i].y) + area.rect_size / 2)
+    for (let i = 0, len = this.hullPoints.length; i < len; i++) {
+      this.path += i==0 ? "M" : " L"
+      this.path += " " + (parseInt(this.hullPoints[i].x) + this.rect_size / 2) + " " + (parseInt(this.hullPoints[i].y) + this.rect_size / 2)
     };
-    area.path += " L " + (parseInt(area.hullPoints[0].x) + area.rect_size / 2) + " " + (parseInt(area.hullPoints[0].y) + area.rect_size / 2)
-    area.field.append("path")
+    this.path += " L " + (parseInt(this.hullPoints[0].x) + this.rect_size / 2) + " " + (parseInt(this.hullPoints[0].y) + this.rect_size / 2)
+    this.field.append("path")
     .attr("id", "perimeter")
-    .attr("d", area.path)
+    .attr("d", this.path)
     .attr("stroke", "blue")
     .attr("stroke-width", 2)
     .attr("fill", "none");
+    console.log('lol');
+
   }
 
   simulate() {
@@ -193,34 +199,34 @@ class GUI {
 
     // target
     var target = new dp.Target(start, 5);
-    target.marker = area.field
+    target.marker = this.field
     .append("circle")
     .attr("id", "bigfoot")
-    .attr("cx", start.x + area.rect_size / 2)
-    .attr("cy", start.y + area.rect_size / 2)
+    .attr("cx", start.x + this.rect_size / 2)
+    .attr("cy", start.y + this.rect_size / 2)
     .attr("r", 8)
     .style("fill", "purple");
 
 
     // drones
     var gdrones = []
-    for (let i = 0, len = area.stations.length; i < len; i++) {
+    for (let i = 0, len = this.stations.length; i < len; i++) {
       var drones = [];
       for (var j = 0; j < 3; j++) {
-        var drone = new dp.Drone(new dp.Position(area.stations[i].position.x, area.stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
-        drone.marker = area.field
+        var drone = new dp.Drone(new dp.Position(this.stations[i].position.x, this.stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
+        drone.marker = this.field
         .append("circle")
-        .attr("cx", area.stations[i].position.x + area.rect_size / 2)
-        .attr("cy", area.stations[i].position.y + area.rect_size / 2)
+        .attr("cx", this.stations[i].position.x + this.rect_size / 2)
+        .attr("cy", this.stations[i].position.y + this.rect_size / 2)
         .attr("r", 10)
         .style("fill", "blue");
         drones.push(drone)
         gdrones.push(drone)
       }
-      area.stations[i].drones = drones;
-      area.stations[i].drones_in_dock = drones.length;
+      this.stations[i].drones = drones;
+      this.stations[i].drones_in_dock = drones.length;
 
-      // console.log(area.stations[i].drones);
+      // console.log(this.stations[i].drones);
     }
 
     target.move_to(end);
@@ -242,14 +248,14 @@ class GUI {
 
       // drone watchers
       var watcher_drone = target.followed_by
-      if (coordsAreInside([target.position.x, target.position.y], area.hullPoints)) {
+      if (coordsAreInside([target.position.x, target.position.y], this.hullPoints)) {
         if (!watcher_drone) {
-          watcher_drone = target.get_closest_station(area.stations).get_drone();
+          watcher_drone = target.get_closest_station(this.stations).get_drone();
           console.log(watcher_drone);
         }
 
-        if (!watcher_drone.enough_battery(area.stations)) {
-          var cs = watcher_drone.get_closest_station(area.stations);
+        if (!watcher_drone.enough_battery(this.stations)) {
+          var cs = watcher_drone.get_closest_station(this.stations);
           var switch_drone = cs.get_drone();
           watcher_drone.target = cs;
           cs.add_drone(watcher_drone);
@@ -263,7 +269,7 @@ class GUI {
 
       } else {
         if (watcher_drone) {
-          var station = watcher_drone.get_closest_station_for_land(area.stations);
+          var station = watcher_drone.get_closest_station_for_land(this.stations);
           watcher_drone.target = station;
           station.add_drone(watcher_drone);
           target.followed_by = null;
@@ -290,3 +296,5 @@ class GUI {
 
   }
 }
+
+module.exports.area = new GUI(800);
