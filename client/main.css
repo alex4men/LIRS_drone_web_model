@@ -13,14 +13,38 @@ svg {
 }
 
 .vertex {
+	width: 20px;
+	height: 20px;
 	position: absolute;
 	transform: translate(-50%, -50%);
 }
 
 .station {
+	width: 20px;
+	height: 20px;
 	fill: blue;
 	transform: translate(-50%, -50%);
 
+}
+
+#perimeter {
+	stroke: blue;
+	stroke-width: 1px;
+	fill: none;
+}
+
+#start {
+	width: 20px;
+	height: 20px;
+	fill: green;
+	transform: translate(-50%, -50%);
+}
+
+#end {
+	width: 20px;
+	height: 20px;
+	fill: red;
+	transform: translate(-50%, -50%);
 }
 /*#canvas {
 	height: 498px;

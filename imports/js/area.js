@@ -1,8 +1,5 @@
 import { Template } from 'meteor/templating';
 
-import { mouse, mouseStatus, getRandomInt, getRandomArbitrary } from './utils';
-import { ConvexHullGrahamScan } from './graham';
-
 import { dp } from './ai';
 import { drawPerimeter } from './render';
 
@@ -11,29 +8,28 @@ import './area.html';
 
 
 Template.area.events({
-	'click #area'(event) {
-		event.preventDefault();
+	'click #perimeter'(event) {
+		event.stopPropagation();
+	},
 
+	'click #area'(event) {
 		var id = +new Date; // timestamp
 
 		field.append('rect')
 		.attr('id','vertex_'+id)
-		.attr('width', rect_size)
-		.attr('height', rect_size)
+		.attr('class', 'vertex')
 		.attr('x', event.offsetX)
-		.attr('y', event.offsetY)
-		.attr('class', 'vertex');
+		.attr('y', event.offsetY);
 
 		drawPerimeter();
-
 	},
 
 	'click .vertex, contextmenu .station'(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		event.target.remove();
+
 		drawPerimeter();
-		
 	},
 
 	'contextmenu #area'(event) {
@@ -43,18 +39,16 @@ Template.area.events({
 
 		field.append('rect')
 		.attr('id','station_'+id)
-		.attr('width', rect_size)
-		.attr('height', rect_size)
+		.attr('class', 'station')
 		.attr('x', event.offsetX)
-		.attr('y', event.offsetY)
-		.attr('class', 'station');
+		.attr('y', event.offsetY);
 
 		stations.push(new dp.Station(new dp.Position(event.offsetX, event.offsetY), []));
 	},
 
 });
 
-Template.area.onRendered(function(){
+Template.area.onCreated(function(){
 	settings = {
 		speed: 6,
 		droneSpeed: 10,
@@ -64,8 +58,5 @@ Template.area.onRendered(function(){
 	vertices = [];
 	stations = [];
 	drones = [];
-	rect_size = 20;
-	hullPoints = [];
-	convexHull = new ConvexHullGrahamScan();
 	field = d3.select('#area').append('svg').attr('width', 800).attr('height', 800);
 });
