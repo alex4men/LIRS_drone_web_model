@@ -48,7 +48,7 @@ Template.area.events({
 
 });
 
-Template.area.onCreated(function(){
+Template.area.onRendered(function(){
 	settings = {
 		speed: 6,
 		droneSpeed: 10,
