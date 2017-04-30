@@ -1,3 +1,8 @@
+import { getRandomInt, getRandomArbitrary } from './utils';
+import { dp } from './ai';
+import { coordsAreInside } from './graham';
+
+
 export function getWay() {
   d3.select('#start').remove();
   d3.select('#end').remove();
@@ -75,66 +80,70 @@ export function simulate() {
   d3.timer(step, 150);
   var count = 1000;
   
+
+  function step() {
+    if (target.is_goal_reached(end)) {
+      return;
+    }
+    target.move_to(end);
+    // let c = d3.select("#bigfoot")
+    // .transition()
+    // .attr('cy', 600)
+    // .duration(2000)
+    // .ease('linear')
+    target.marker.attr("cx", target.position.x)
+    target.marker.attr("cy", target.position.y)
+
+    // drone watchers
+    var watcher_drone = target.followed_by
+    if (coordsAreInside([target.position.x, target.position.y], hullPoints)) {
+      if (!watcher_drone) {
+        watcher_drone = target.get_closest_station(stations).get_drone();
+        console.log(watcher_drone);
+      }
+
+      if (!watcher_drone.enough_battery(stations)) {
+        var cs = watcher_drone.get_closest_station(stations);
+        var switch_drone = cs.get_drone();
+        watcher_drone.target = cs;
+        cs.add_drone(watcher_drone);
+
+        watcher_drone = switch_drone;
+      } else {
+        watcher_drone.target = target;
+      }
+
+      target.followed_by = watcher_drone;
+
+    } else {
+      if (watcher_drone) {
+        var station = watcher_drone.get_closest_station_for_land(stations);
+        watcher_drone.target = station;
+        station.add_drone(watcher_drone);
+        target.followed_by = null;
+      }
+    }
+
+    for (var i = 0; i < gdrones.length; i++) {
+      var gd = gdrones[i];
+
+      if (gd.target) {
+        gd.pursue();
+        gd.speed = settings.droneSpeed;
+        gd.marker.attr("cx", gd.position.x)
+        gd.marker.attr("cy", gd.position.y)
+
+        // hack for checking whether it is a station
+        if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
+          gd.capacity = BATTERY_CAPACITY;
+        }
+      }
+    }
+  }
+
+
+
   step();
 
 }
 
-function step() {
-  if (target.is_goal_reached(end)) {
-    return;
-  }
-  target.move_to(end);
-  // let c = d3.select("#bigfoot")
-  // .transition()
-  // .attr('cy', 600)
-  // .duration(2000)
-  // .ease('linear')
-  target.marker.attr("cx", target.position.x)
-  target.marker.attr("cy", target.position.y)
-
-  // drone watchers
-  var watcher_drone = target.followed_by
-  if (coordsAreInside([target.position.x, target.position.y], hullPoints)) {
-    if (!watcher_drone) {
-      watcher_drone = target.get_closest_station(stations).get_drone();
-      console.log(watcher_drone);
-    }
-
-    if (!watcher_drone.enough_battery(stations)) {
-      var cs = watcher_drone.get_closest_station(stations);
-      var switch_drone = cs.get_drone();
-      watcher_drone.target = cs;
-      cs.add_drone(watcher_drone);
-
-      watcher_drone = switch_drone;
-    } else {
-      watcher_drone.target = target;
-    }
-
-    target.followed_by = watcher_drone;
-
-  } else {
-    if (watcher_drone) {
-      var station = watcher_drone.get_closest_station_for_land(stations);
-      watcher_drone.target = station;
-      station.add_drone(watcher_drone);
-      target.followed_by = null;
-    }
-  }
-
-  for (var i = 0; i < gdrones.length; i++) {
-    var gd = gdrones[i];
-
-    if (gd.target) {
-      gd.pursue();
-      gd.speed = settings.droneSpeed;
-      gd.marker.attr("cx", gd.position.x)
-      gd.marker.attr("cy", gd.position.y)
-
-      // hack for checking whether it is a station
-      if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
-        gd.capacity = BATTERY_CAPACITY;
-      }
-    }
-  }
-}

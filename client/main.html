@@ -9,45 +9,45 @@
 <body>
 
 	<nav class="light-blue lighten-1" role="navigation">
-	    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Drones</a>
+	    <div class="nav-wrapper container">
+            <a id="logo-container" href="#" class="brand-logo">Drones</a>
 	    </div>
 	</nav>
 
-	<div class="container" style="width: 90%">
+	<div class="container">
 	    <div class="section">
 	        <div class="row">
-	            <div class="col s7">
+	            <div class="col s8">
 	            	
 	            	{{> area}}
 
 	            </div>
-	            <div class="col s5">
-	                <div class="card" style="margin-top: 0px;">
-	                    <div class="card-tabs">
-	                        <ul class="tabs tabs-fixed-width">
-	                            <li class="tab"><a class="active" href="#perimeter" id="perimeter_button">Perimeter</a></li>
-	                            <li class="tab"><a href="#stations" id="stations_button">Stations</a></li>
-	                            <li class="tab"><a href="#map" id="screen_edit">Edit</a></li>
-								<li class="tab"><a href="#global-params" id="screen_global_params">Global params</a></li>
-	                        </ul>
-	                    </div>
-	                    <div class="card-content grey lighten-4">
-	                        <div id="perimeter">
-								<div class="screen_content" id="screen_perimeter" style="display: block;">
-									<span>Perimeter</span>
-									<div class="perimeter_menu">
-										<a class="waves-effect waves-light btn" id="perimeter_undo" onclick="popPoint();"><i class="material-icons left">skip_previous</i>Undo</a>
-										<a class="waves-effect waves-light btn" id="perimeter_redo" onclick="restoreDeletedPoint();"><i class="material-icons left">skip_next</i>Redo</a>
-									</div>
-									<ul class="collection" id="perimeter_points_holder"></ul>
-								</div>
-	                        </div>
-							<div id="stations">
-								<ul class="collection" id="stations_holder"></ul>
-							</div>
-						</div>
-					</div>
-				</div>                            
+	            <div class="col s4">
+                    <div class="card">
+                        <div class="card-tabs">
+                            <ul class="tabs tabs-fixed-width">
+                                <li class="tab"><a href="#perimeter" id="perimeter_button">Perimeter</a></li>
+                                <li class="tab"><a href="#stations" id="stations_button">Stations</a></li>
+                                <li class="tab"><a class="active" href="#simulation" id="screen_simulate">Simulate</a></li>
+                            </ul>
+                        </div>
+                        <div class="card-content grey lighten-4">
+
+                            <div id="perimeter">
+                                {{> perimeterMenu}}
+                            </div>
+
+                            <div id="stations">
+                                {{> stationsMenu}}
+                            </div>
+
+                            <div id="simulation">
+                                {{> simulateMenu}}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 			</div>
 		</div>
 	</div>

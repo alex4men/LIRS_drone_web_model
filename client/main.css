@@ -1,8 +1,14 @@
 /** Elements */
+.container {
+	width: 90%;
+}
+
+.card {
+	margin-top: 0px;
+}
 
 #area {
     border: 3px solid #fca15c;
-    margin: 30px;
     width: 800px;
     height: 800px;
 }

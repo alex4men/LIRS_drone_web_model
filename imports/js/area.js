@@ -6,7 +6,6 @@ import { drawPerimeter } from './render';
 import './area.html';
 
 
-
 Template.area.events({
 	'click #perimeter'(event) {
 		event.stopPropagation();

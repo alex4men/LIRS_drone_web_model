@@ -1,6 +1,10 @@
 import { Template } from 'meteor/templating';
 
 import '../imports/js/area.js';
+import '../imports/js/perimeterMenu.js';
+import '../imports/js/stationsMenu.js';
+import '../imports/js/simulateMenu.js';
+
 
 import './main.html';
 

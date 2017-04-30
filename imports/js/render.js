@@ -9,7 +9,7 @@ export function drawPerimeter() {
 	});
 	var convexHull = new ConvexHullGrahamScan();
 	vertices.map(function (el) {convexHull.addPoint(el[0], el[1]); });
-	var hullPoints = convexHull.getHull();
+	hullPoints = convexHull.getHull();
 	var path       = ""
 
 	if (hullPoints.length < 3)
