@@ -1,7 +1,7 @@
 import { Template } from 'meteor/templating';
 
 import './simulateMenu.html';
-import { getWay, simulate } from './simulate.js';
+import { getWay, simulate, stopSimulation } from './simulate.js';
 
 
 Template.simulateMenu.events({
