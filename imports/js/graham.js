@@ -1,7 +1,7 @@
 // https://github.com/brian3kb/graham_scan_js
 // http://jsfiddle.net/HYEONGJINKIM/wmcopdko/
 
-function ConvexHullGrahamScan() {
+export function ConvexHullGrahamScan() {
     this.anchorPoint = void 0, this.reverse = !1, this.points = []
 }
 ConvexHullGrahamScan.prototype = {
@@ -75,7 +75,7 @@ Vec2.perpdot = function (v1, v2) {
 // polyVerts - Array of Vec2's (2-element Arrays). The vertices that make
 //             up the polygon, in clockwise order around the polygon.
 //
-function coordsAreInside(point, polyVerts) {
+export function coordsAreInside(point, polyVerts) {
   var i, len, v1, v2, edge, x
   // First translate the polygon so that `point` is the origin. Then, for each
   // edge, get the angle between two vectors: 1) the edge vector and 2) the

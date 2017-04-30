@@ -216,4 +216,4 @@ DronePatrol.prototype.Target.prototype.get_closest_station = function(stations) 
     return nearestStation;
 }
 
-//module.exports = DronePatrol;
+module.exports.dp = new DronePatrol();
