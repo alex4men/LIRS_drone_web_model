@@ -4,6 +4,9 @@ import { coordsAreInside } from './graham';
 
 
 export function getWay() {
+  d3.selectAll("#bigfoot").remove();
+  d3.selectAll("#adrone").remove();
+  
   let start = edges[getRandomInt(0, edges.length - 1)];
   let end   = edges[getRandomInt(0, edges.length - 1)];
 
@@ -62,7 +65,7 @@ export function simulate() {
   .attr("id", "bigfoot")
   .attr("cx", start.x)
   .attr("cy", start.y)
-  .attr("r", 8)
+  .attr("r", 10)
   .style("fill", "purple");
 
 
@@ -74,9 +77,10 @@ export function simulate() {
       var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
       drone.marker = field
       .append("circle")
+	  .attr("id", "adrone")
       .attr("cx", stations[i].position.x)
       .attr("cy", stations[i].position.y)
-      .attr("r", 10)
+      .attr("r", 8)
       .style("fill", "blue");
       drones.push(drone)
       gdrones.push(drone)

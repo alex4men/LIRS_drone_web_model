@@ -6,10 +6,19 @@
     <script src="https://d3js.org/d3.v4.js"></script>
 	<script>
 		// Initialize global variables
-		simulation_stop = 0;
-		settings = {
-			speed: 1,
-			droneSpeed: 5,
+		window.onload = function() {
+			simulation_stop = 0;
+		
+			var DEFAULT_SPEED = 1;
+			var DEFAULT_DRONE_SPEED = 3;
+		
+			settings = {
+				speed: DEFAULT_SPEED,
+				droneSpeed: DEFAULT_DRONE_SPEED,
+			};
+
+			document.getElementById("simulation_speed").value = DEFAULT_SPEED;
+			document.getElementById("simulation_dronespeed").value = DEFAULT_DRONE_SPEED;
 		};
 	</script>
 </head>
