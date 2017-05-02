@@ -21,3 +21,9 @@ Template.simulateMenu.events({
 		stopSimulation();
 	},
 });
+
+
+Template.area.onRendered(function(){
+	document.getElementById("simulation_speed").value = settings.speed;
+	document.getElementById("simulation_dronespeed").value = settings.droneSpeed;
+});

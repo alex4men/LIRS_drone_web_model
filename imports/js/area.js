@@ -49,8 +49,8 @@ Template.area.events({
 
 Template.area.onRendered(function(){
 	settings = {
-		speed: 6,
-		droneSpeed: 10,
+		speed: 1,
+		droneSpeed: 3,
 	};
 	path = "";
 	edges = [];
