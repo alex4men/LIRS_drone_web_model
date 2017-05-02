@@ -80,7 +80,7 @@ export function simulate() {
 	  .attr("id", "adrone")
       .attr("cx", stations[i].position.x)
       .attr("cy", stations[i].position.y)
-      .attr("r", 8)
+      .attr("r", 6)
       .style("fill", "blue");
       drones.push(drone)
       gdrones.push(drone)
@@ -115,15 +115,24 @@ export function simulate() {
     var watcher_drone = target.followed_by
     if (territory.is_inside(target)) {
       if (!watcher_drone) {
-        watcher_drone = target.get_closest_station(stations).get_drone();
+		var station = target.get_closest_station(stations);
+		watcher_drone = station.get_drone();
+		
+		// Delete the mark of the drone which is gone
+		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
+
         console.log(watcher_drone);
       }
 
       if (!watcher_drone.enough_battery(stations)) {
-        var cs = watcher_drone.get_closest_station(stations);
-        var switch_drone = cs.get_drone();
-        watcher_drone.target = cs;
-        cs.add_drone(watcher_drone);
+        var station = watcher_drone.get_closest_station(stations);
+        var switch_drone = station.get_drone();
+		
+		// Delete the mark of the drone which is gone
+		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
+		
+        watcher_drone.target = station;
+        station.add_drone(watcher_drone);
 
         watcher_drone = switch_drone;
       } else {
@@ -135,8 +144,9 @@ export function simulate() {
     } else {
       if (watcher_drone) {
         var station = watcher_drone.get_closest_station_for_land(stations);
-        watcher_drone.target = station;
+        watcher_drone.target = station;		
         station.add_drone(watcher_drone);
+		
         target.followed_by = null;
       }
     }
@@ -152,8 +162,20 @@ export function simulate() {
 
         // hack for checking whether it is a station
         if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
-          gd.capacity = BATTERY_CAPACITY;
-        }
+            var station = gd.target;
+			
+			// Make a mark on the map that this droid is on the station
+			field.append("circle")
+				.attr('id', station.id + '_droneCounter_' + (station.drones_in_dock-1))
+				.attr('class', 'droneCounter')
+				.attr("cx", station.position.x + 15)
+				.attr("cy", station.position.y - 8 + 5*(station.drones_in_dock-1))
+				.attr("r", 2)
+				.style("fill", "blue");
+			
+			//station.add_drone(gd);
+			gd.capacity = BATTERY_CAPACITY;
+		}
       }
     }
   }

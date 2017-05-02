@@ -10,11 +10,12 @@ DronePatrol.prototype.Territory = function(pillars = []) {
     this.pillars = pillars;
 }
 
-DronePatrol.prototype.Station = function(position, drones = []) {
+DronePatrol.prototype.Station = function(id, position, drones = []) {
     this.position = position; // position of station
     this.docks = 3; // number of drone slots
     this.drones_in_dock = drones.length;
-    this.drones = drones
+    this.drones = drones;
+	this.id = id;
 }
 
 DronePatrol.prototype.Drone = function(position, speed, capacity) {
