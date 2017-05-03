@@ -16,6 +16,7 @@ DronePatrol.prototype.Station = function(id, position, drones = []) {
     this.drones_in_dock = drones.length;
     this.drones = drones;
 	this.id = id;
+	this.targeted = 0;
 }
 
 DronePatrol.prototype.Drone = function(position, speed, capacity) {
@@ -85,13 +86,14 @@ DronePatrol.prototype.Drone.prototype.get_closest_station = function(stations) {
 DronePatrol.prototype.Drone.prototype.get_closest_station_for_land = function(stations) {
     let min = 99999999999999999;
     let nearestStation = null;
+
     for (var i = 0; i < stations.length; i++) {
         let station = stations[i];
         let h = station.position.y - this.position.y;
         let l = station.position.x - this.position.x;
         let distance = Math.sqrt(h*h + l*l);
 
-        if (distance < min && station.docks > station.drones.length) {
+        if (distance < min && station.docks > (station.drones_in_dock + station.targeted)) {
             min = distance;
             nearestStation = station;
         }

@@ -26,7 +26,7 @@ export function getWay() {
 }
 
 // getVertices() - get list of vertices coordinates ( [[x1,y1], [x2,y2]] )
-export function getVertices() {
+function getVertices() {
     area.vertices = d3.selectAll('.vertex').nodes().map(function (el) {
       return [parseInt(d3.select(el).attr('x')), parseInt(d3.select(el).attr('y'))];
     });
@@ -70,10 +70,23 @@ export function simulate() {
 
 
   // drones
-  var gdrones = []
+  var gdrones = [];
   for (let i = 0, len = stations.length; i < len; i++) {
+	stations[i].targeted = 0;
+	d3.selectAll('.' + stations[i].id + '_droneCounter').remove();
+	
     var drones = [];
-    for (var j = 0; j < 3; j++) {
+    for (var j = 0; j < stations[i].docks; j++) {
+	  // Draw a drone mark
+	  field.append("circle")
+		.attr('id', stations[i].id + '_droneCounter_' + i)
+		.attr('class', stations[i].id + '_droneCounter')
+		.attr("cx", stations[i].position.x + 15)
+		.attr("cy", stations[i].position.y - 8 + 5*j)
+		.attr("r", 2)
+		.style("fill", "blue");
+	  
+	  // Add a drone to the station
       var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
       drone.marker = field
       .append("circle")
@@ -93,13 +106,13 @@ export function simulate() {
 
   target.move_to(end);
   // Start animation.
-  d3.timer(step, 150);
-  var count = 1000;
-  
+  var t = d3.timer(step, 150);
 
   function step() {
+	console.log("step is working");
 	if (simulation_stop == 1) {
-		return true;
+		t.stop();
+		return;
 	}
     if (target.is_goal_reached(end)) {
         var x = Math.random() * (800 - 0) + 0;
@@ -119,6 +132,7 @@ export function simulate() {
 		watcher_drone = station.get_drone();
 		
 		// Delete the mark of the drone which is gone
+		console.log("Start. deleting drone: " + station.id + '_droneCounter_' + station.drones_in_dock);
 		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
 
         console.log(watcher_drone);
@@ -129,12 +143,14 @@ export function simulate() {
         var switch_drone = station.get_drone();
 		
 		// Delete the mark of the drone which is gone
+		console.log("deleting drone: " + station.id + '_droneCounter_' + station.drones_in_dock);
 		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
 		
         watcher_drone.target = station;
-        station.add_drone(watcher_drone);
+		station.targeted++;
 
         watcher_drone = switch_drone;
+		
       } else {
         watcher_drone.target = target;
       }
@@ -142,10 +158,11 @@ export function simulate() {
       target.followed_by = watcher_drone;
 
     } else {
-      if (watcher_drone) {
+      if (watcher_drone && watcher_drone.target != null 
+			&& typeof watcher_drone.target.docks == 'undefined') {
         var station = watcher_drone.get_closest_station_for_land(stations);
-        watcher_drone.target = station;		
-        station.add_drone(watcher_drone);
+        watcher_drone.target = station;
+		station.targeted++;		
 		
         target.followed_by = null;
       }
@@ -157,23 +174,29 @@ export function simulate() {
       if (gd.target) {
         gd.pursue();
         gd.speed = settings.droneSpeed;
-        gd.marker.attr("cx", gd.position.x)
-        gd.marker.attr("cy", gd.position.y)
+        gd.marker.attr("cx", gd.position.x);
+        gd.marker.attr("cy", gd.position.y);
 
         // hack for checking whether it is a station
-        if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
-            var station = gd.target;
+        if (gd.is_station_reached() && gd.target != null 
+				&& typeof gd.target.docks != 'undefined') {
+            
+			var station = gd.target;
+			station.targeted--;
 			
 			// Make a mark on the map that this droid is on the station
 			field.append("circle")
-				.attr('id', station.id + '_droneCounter_' + (station.drones_in_dock-1))
+				.attr('id', station.id + '_droneCounter_' + station.drones_in_dock)
 				.attr('class', 'droneCounter')
 				.attr("cx", station.position.x + 15)
-				.attr("cy", station.position.y - 8 + 5*(station.drones_in_dock-1))
+				.attr("cy", station.position.y - 8 + 5*station.drones_in_dock)
 				.attr("r", 2)
 				.style("fill", "blue");
 			
-			//station.add_drone(gd);
+			station.add_drone(gd);
+			gd.target = null;
+			gd.marker.attr("cx", station.position.x);
+			gd.marker.attr("cy", station.position.y);
 			gd.capacity = BATTERY_CAPACITY;
 		}
       }
