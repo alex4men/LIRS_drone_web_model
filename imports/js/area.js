@@ -27,6 +27,11 @@ Template.area.events({
 		event.preventDefault();
 		event.stopPropagation();
 		event.target.remove();
+		
+		if (event.target.class = 'station') {
+			var station = event.target;
+			d3.selectAll('.' + station.id + '_droneCounter').remove();
+		}
 
 		drawPerimeter();
 	},
@@ -34,23 +39,35 @@ Template.area.events({
 	'contextmenu #area'(event) {
 		event.preventDefault();
 
-		var id = +new Date; // timestamp
-
+		var d = new Date();
+		var id = 'station_' + d.getTime();
+		
 		field.append('rect')
-		.attr('id','station_'+id)
+		.attr('id',id)
 		.attr('class', 'station')
 		.attr('x', event.offsetX)
 		.attr('y', event.offsetY);
-
-		stations.push(new dp.Station(new dp.Position(event.offsetX, event.offsetY), []));
+		
+		var station = new dp.Station(id, new dp.Position(event.offsetX, event.offsetY), []);
+		stations.push(station);
+		
+		for (i = 0; i < station.docks; i++) {
+			field.append("circle")
+			.attr('id', id + '_droneCounter_' + i)
+			.attr('class', id + '_droneCounter')
+			.attr("cx", station.position.x + 15)
+			.attr("cy", station.position.y - 8 + 5*i)
+			.attr("r", 2)
+			.style("fill", "blue");
+		}
 	},
 
 });
 
 Template.area.onRendered(function(){
 	settings = {
-		speed: 6,
-		droneSpeed: 10,
+		speed: 1,
+		droneSpeed: 3,
 	};
 	path = "";
 	edges = [];

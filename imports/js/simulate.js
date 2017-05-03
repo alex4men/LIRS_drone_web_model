@@ -4,9 +4,9 @@ import { coordsAreInside } from './graham';
 
 
 export function getWay() {
-  d3.select('#start').remove();
-  d3.select('#end').remove();
-
+  d3.selectAll("#bigfoot").remove();
+  d3.selectAll("#adrone").remove();
+  
   let start = edges[getRandomInt(0, edges.length - 1)];
   let end   = edges[getRandomInt(0, edges.length - 1)];
 
@@ -22,26 +22,41 @@ export function getWay() {
   t2[0] = getRandomArbitrary(Math.min(end[0][0], end[1][0]), Math.max(end[0][0], end[1][0]));
   t2[1] = end[1][1] - m2 * (end[1][0] - t2[0]);
 
-  field.append('rect')
-  .attr('x', t1[0])
-  .attr('y', t1[1])
-  .attr("id", "start");
-
-  field.append('rect')
-  .attr('x', t2[0])
-  .attr('y', t2[1])
-  .attr("id", "end");
-
   return([t1, t2]);
 }
 
+// getVertices() - get list of vertices coordinates ( [[x1,y1], [x2,y2]] )
+export function getVertices() {
+    area.vertices = d3.selectAll('.vertex').nodes().map(function (el) {
+      return [parseInt(d3.select(el).attr('x')), parseInt(d3.select(el).attr('y'))];
+    });
+
+    return area.vertices;
+}
+
+
 export function simulate() {
+  simulation_stop = 0;
   var BATTERY_CAPACITY = 55;
 
   // start positions for bigfoot
-  var start = new dp.Position(parseInt(d3.select("#start").attr('x')), parseInt(d3.select("#start").attr('y')));
-  var end   = new dp.Position(parseInt(d3.select("#end").attr('x')), parseInt(d3.select("#end").attr('y')));
+  var way = getWay();
+  var start = new dp.Position(way[0][0], way[0][1]);
+  var end   = new dp.Position(way[1][0], way[1][1]);
   console.log(start);
+  
+  // territory
+  var verticies = getVertices();
+	var pillars = [];
+    for (i = 0; i < verticies.length; i++) {
+		var p = new dp.Position(verticies[i][0], verticies[i][1]);
+		pillars.push(p);
+		// workaround for triangles
+		if (i == 2 && verticies.length == 3) {
+			pillars.push(new dp.Position(verticies[i][0], verticies[i][1]));
+		}
+	}
+	var territory = new dp.Territory(pillars);
 
   // target
   var target = new dp.Target(start, 5);
@@ -50,7 +65,7 @@ export function simulate() {
   .attr("id", "bigfoot")
   .attr("cx", start.x)
   .attr("cy", start.y)
-  .attr("r", 8)
+  .attr("r", 10)
   .style("fill", "purple");
 
 
@@ -62,9 +77,10 @@ export function simulate() {
       var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
       drone.marker = field
       .append("circle")
+	  .attr("id", "adrone")
       .attr("cx", stations[i].position.x)
       .attr("cy", stations[i].position.y)
-      .attr("r", 10)
+      .attr("r", 6)
       .style("fill", "blue");
       drones.push(drone)
       gdrones.push(drone)
@@ -82,31 +98,41 @@ export function simulate() {
   
 
   function step() {
+	if (simulation_stop == 1) {
+		return true;
+	}
     if (target.is_goal_reached(end)) {
-      return;
+        var x = Math.random() * (800 - 0) + 0;
+		var y = Math.random() * (800 - 0) + 0;
+
+		end = new dp.Position(x, y);
     }
     target.move_to(end);
-    // let c = d3.select("#bigfoot")
-    // .transition()
-    // .attr('cy', 600)
-    // .duration(2000)
-    // .ease('linear')
     target.marker.attr("cx", target.position.x)
     target.marker.attr("cy", target.position.y)
 
     // drone watchers
     var watcher_drone = target.followed_by
-    if (coordsAreInside([target.position.x, target.position.y], hullPoints)) {
+    if (territory.is_inside(target)) {
       if (!watcher_drone) {
-        watcher_drone = target.get_closest_station(stations).get_drone();
+		var station = target.get_closest_station(stations);
+		watcher_drone = station.get_drone();
+		
+		// Delete the mark of the drone which is gone
+		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
+
         console.log(watcher_drone);
       }
 
       if (!watcher_drone.enough_battery(stations)) {
-        var cs = watcher_drone.get_closest_station(stations);
-        var switch_drone = cs.get_drone();
-        watcher_drone.target = cs;
-        cs.add_drone(watcher_drone);
+        var station = watcher_drone.get_closest_station(stations);
+        var switch_drone = station.get_drone();
+		
+		// Delete the mark of the drone which is gone
+		d3.selectAll('#' + station.id + '_droneCounter_' + station.drones_in_dock).remove();
+		
+        watcher_drone.target = station;
+        station.add_drone(watcher_drone);
 
         watcher_drone = switch_drone;
       } else {
@@ -118,8 +144,9 @@ export function simulate() {
     } else {
       if (watcher_drone) {
         var station = watcher_drone.get_closest_station_for_land(stations);
-        watcher_drone.target = station;
+        watcher_drone.target = station;		
         station.add_drone(watcher_drone);
+		
         target.followed_by = null;
       }
     }
@@ -135,8 +162,20 @@ export function simulate() {
 
         // hack for checking whether it is a station
         if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
-          gd.capacity = BATTERY_CAPACITY;
-        }
+            var station = gd.target;
+			
+			// Make a mark on the map that this droid is on the station
+			field.append("circle")
+				.attr('id', station.id + '_droneCounter_' + (station.drones_in_dock-1))
+				.attr('class', 'droneCounter')
+				.attr("cx", station.position.x + 15)
+				.attr("cy", station.position.y - 8 + 5*(station.drones_in_dock-1))
+				.attr("r", 2)
+				.style("fill", "blue");
+			
+			//station.add_drone(gd);
+			gd.capacity = BATTERY_CAPACITY;
+		}
       }
     }
   }
@@ -145,5 +184,9 @@ export function simulate() {
 
   step();
 
+}
+
+export function stopSimulation() {
+	simulation_stop = 1;
 }
 

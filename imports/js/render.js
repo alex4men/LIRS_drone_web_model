@@ -7,6 +7,9 @@ export function drawPerimeter() {
 	var vertices = d3.selectAll('.vertex').nodes().map(function (el) {
 		return [parseInt(d3.select(el).attr('x')), parseInt(d3.select(el).attr('y'))];
 	});
+	
+	console.log(d3.selectAll('.vertex'));
+	
 	var convexHull = new ConvexHullGrahamScan();
 	vertices.map(function (el) {convexHull.addPoint(el[0], el[1]); });
 	hullPoints = convexHull.getHull();

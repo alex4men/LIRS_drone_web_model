@@ -52,6 +52,11 @@ svg {
 	fill: red;
 	transform: translate(-50%, -50%);
 }
+
+.tabs-fixed-width {
+	overflow: hidden;
+}
+
 /*#canvas {
 	height: 498px;
 	width: 498px;
