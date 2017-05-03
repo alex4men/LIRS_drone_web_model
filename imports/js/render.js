@@ -4,7 +4,7 @@ import { ConvexHullGrahamScan } from './graham';
 export function drawPerimeter() {
 	// draw Perimeter
 	d3.select("#perimeter").remove();
-	var vertices = d3.selectAll('.vertex').nodes().map(function (el) {
+	vertices = d3.selectAll('.vertex').nodes().map(function (el) {
 		return [parseInt(d3.select(el).attr('x')), parseInt(d3.select(el).attr('y'))];
 	});
 	

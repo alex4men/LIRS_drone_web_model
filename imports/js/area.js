@@ -30,6 +30,14 @@ Template.area.events({
 		
 		if (event.target.class = 'station') {
 			var station = event.target;
+			
+			for (i = 0; i < stations.length; i++) {
+				if (stations[i].id == station.id) {
+					stations.splice(i, 1);
+					break;
+				}
+			}
+			// Remove drone marks from the area
 			d3.selectAll('.' + station.id + '_droneCounter').remove();
 		}
 
@@ -67,12 +75,12 @@ Template.area.events({
 Template.area.onRendered(function(){
 	settings = {
 		speed: 1,
-		droneSpeed: 3,
+		droneSpeed: 5,
 	};
+	
 	path = "";
 	edges = [];
 	vertices = [];
 	stations = [];
-	drones = [];
 	field = d3.select('#area').append('svg').attr('width', 800).attr('height', 800);
 });
