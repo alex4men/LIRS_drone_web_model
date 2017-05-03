@@ -186,7 +186,7 @@ export function simulate() {
 			// Make a mark on the map that this droid is on the station
 			field.append("circle")
 				.attr('id', station.id + '_droneCounter_' + station.drones_in_dock)
-				.attr('class', 'droneCounter')
+				.attr('class', station.id + '_droneCounter')
 				.attr("cx", station.position.x + 15)
 				.attr("cy", station.position.y - 8 + 5*station.drones_in_dock)
 				.attr("r", 2)
@@ -210,5 +210,7 @@ export function simulate() {
 
 export function stopSimulation() {
 	simulation_stop = 1;
+	d3.selectAll("#bigfoot").remove();
+    d3.selectAll("#adrone").remove();
 }
 
