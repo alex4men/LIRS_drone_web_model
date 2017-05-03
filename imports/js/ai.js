@@ -182,21 +182,30 @@ DronePatrol.prototype.Station.prototype.get_drone = function() {
 
 // Checks wether object in rectangle
 DronePatrol.prototype.Territory.prototype.is_inside = function(target) {
-    let a = this.pillars[0];
-    let b = this.pillars[1];
-    let d = this.pillars[3];
 
-    bax = b.x - a.x;
-    bay = b.y - a.y;
-    dax = d.x - a.x;
-    day = d.y - a.y;
+    function cn_PnPoly( pos, pillars_origin)
+    {
+        var n = pillars_origin.length;
+        var pillars = pillars_origin.slice();
+        pillars[pillars.length] = pillars[0];
+        var cn = 0;    // the  crossing number counter
+        // loop through all edges of the polygon
+        var i;
+        for (i = 0; i < n; i++) {    // edge from V[i]  to V[i+1]
+            if (((pillars[i].y <= pos.y) && (pillars[i+1].y > pos.y))     // an upward crossing
+                || ((pillars[i].y > pos.y) && (pillars[i+1].y <=  pos.y))) { // a downward crossing
+                // compute  the actual edge-ray intersect x-coordinate
+                vt = 0.0;
+                vt = (pos.y  - pillars[i].y) / (pillars[i+1].y - pillars[i].y);
+                if (pos.x <  pillars[i].x + vt * (pillars[i+1].x - pillars[i].x)) // P.x < intersect
+                    ++cn;   // a valid crossing of y=P.y right of P.x
+            }
+        }
+        //return false;
+        return ((cn % 2) == 1);    // 0 if even (out), and 1 if  odd (in)
+    }
 
-    if ((target.position.x - a.x) * bax + (target.position.y - a.y) * bay < 0.0) return false;
-    if ((target.position.x - b.x) * bax + (target.position.y - b.y) * bay > 0.0) return false;
-    if ((target.position.x - a.x) * dax + (target.position.y - a.y) * day < 0.0) return false;
-    if ((target.position.x - d.x) * dax + (target.position.y - d.y) * day > 0.0) return false;
-
-    return true;
+    return cn_PnPoly(target.position, this.pillars);
 }
 
 // Gets closest station to target
