@@ -76,12 +76,20 @@ export function simulate() {
     for (var j = 0; j < 3; j++) {
       var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
       drone.marker = field
-      .append("circle")
-	  .attr("id", "adrone")
-      .attr("cx", stations[i].position.x)
-      .attr("cy", stations[i].position.y)
-      .attr("r", 6)
-      .style("fill", "blue");
+        .append("circle")
+  	    .attr("id", "adrone")
+        .attr("cx", stations[i].position.x)
+        .attr("cy", stations[i].position.y)
+        .attr("r", 6)
+        .style("fill", "blue");
+
+      drone.marker_bat = field
+        .append("rect")
+        .attr("id", "bat_level")
+        .attr("class", "baterey_none")
+        .attr('x', stations[i].position.x)
+        .attr('y', stations[i].position.y);
+
       drones.push(drone)
       gdrones.push(drone)
     }
@@ -161,11 +169,16 @@ export function simulate() {
         gd.speed = settings.droneSpeed;
         gd.marker.attr("cx", gd.position.x)
         gd.marker.attr("cy", gd.position.y)
-        //gd.marker.style("fill", "blue")
+        
+        gd.marker_bat.attr('x', gd.position.x - 6 * 2)
+        gd.marker_bat.attr('y', gd.position.y + 6);
+        gd.marker_bat.attr("class", "baterey")
 
         // hack for checking whether it is a station
         if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
           var station = gd.target;
+
+          gd.marker_bat.attr("class", "baterey_none")
 			
     			// Make a mark on the map that this droid is on the station
     			field.append("circle")

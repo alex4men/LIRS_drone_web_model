@@ -25,6 +25,17 @@ svg {
 	transform: translate(-50%, -50%);
 }
 
+.baterey{
+	fill: black;
+	width: 25px;
+	height: 7px;
+}
+
+.baterey_none{
+	width: 0px;
+	height: 0px;	
+}
+
 .station {
 	width: 20px;
 	height: 20px;
