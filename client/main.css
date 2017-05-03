@@ -26,9 +26,9 @@ svg {
 }
 
 .baterey{
-	fill: black;
-	width: 25px;
-	height: 7px;
+	fill: green;
+	width: 40px;
+	height: 4px;
 }
 
 .baterey_none{

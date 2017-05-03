@@ -170,9 +170,11 @@ export function simulate() {
         gd.marker.attr("cx", gd.position.x)
         gd.marker.attr("cy", gd.position.y)
         
-        gd.marker_bat.attr('x', gd.position.x - 6 * 2)
+        gd.marker_bat.attr('x', gd.position.x - 6 * 3)
         gd.marker_bat.attr('y', gd.position.y + 6);
         gd.marker_bat.attr("class", "baterey")
+
+        gd.marker_bat.style("width", (gd.capacity / BATTERY_CAPACITY) * 40);
 
         // hack for checking whether it is a station
         if (gd.is_station_reached()  && typeof gd.target.docks != 'undefined') {
