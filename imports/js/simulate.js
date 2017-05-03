@@ -72,8 +72,8 @@ export function simulate() {
   // drones
   var gdrones = [];
   for (let i = 0, len = stations.length; i < len; i++) {
-	stations[i].targeted = 0;
-	d3.selectAll('.' + stations[i].id + '_droneCounter').remove();
+    stations[i].targeted = 0;
+    d3.selectAll('.' + stations[i].id + '_droneCounter').remove();
 	
     var drones = [];
     for (var j = 0; j < stations[i].docks; j++) {
@@ -117,10 +117,11 @@ export function simulate() {
   var t = d3.timer(step, 150);
 
   function step() {
-	if (simulation_stop == 1) {
-		t.stop();
-		return;
-	}
+  	if (simulation_stop == 1) {
+  		t.stop();
+  		return;
+  	}
+
     if (target.is_goal_reached(end)) {
       var x = Math.random() * (800 - 0) + 0;
 		  var y = Math.random() * (800 - 0) + 0;
@@ -167,10 +168,10 @@ export function simulate() {
 
     } else {
       if (watcher_drone && watcher_drone.target != null 
-			&& typeof watcher_drone.target.docks == 'undefined') {
+			 && typeof watcher_drone.target.docks == 'undefined') {
         var station = watcher_drone.get_closest_station_for_land(stations);
         watcher_drone.target = station;
-		station.targeted++;		
+		    station.targeted++;		
 		
         target.followed_by = null;
       }
@@ -227,7 +228,9 @@ export function simulate() {
 
 export function stopSimulation() {
 	simulation_stop = 1;
+
 	d3.selectAll("#bigfoot").remove();
-    d3.selectAll("#adrone").remove();
+  d3.selectAll("#adrone").remove();
+  d3.selectAll("#bat_level").remove();
 }
 
