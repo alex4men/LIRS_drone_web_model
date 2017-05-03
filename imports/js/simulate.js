@@ -3,10 +3,7 @@ import { dp } from './ai';
 import { coordsAreInside } from './graham';
 
 
-export function getWay() {
-  d3.selectAll("#bigfoot").remove();
-  d3.selectAll("#adrone").remove();
-  
+export function getWay() {  
   let start = edges[getRandomInt(0, edges.length - 1)];
   let end   = edges[getRandomInt(0, edges.length - 1)];
 
@@ -36,6 +33,9 @@ function getVertices() {
 
 
 export function simulate() {
+  d3.selectAll("#bigfoot").remove();
+  d3.selectAll("#adrone").remove();
+  
   simulation_stop = 0;
   var BATTERY_CAPACITY = 55;
 
@@ -79,7 +79,7 @@ export function simulate() {
     for (var j = 0; j < stations[i].docks; j++) {
 	  // Draw a drone mark
 	  field.append("circle")
-		.attr('id', stations[i].id + '_droneCounter_' + i)
+		.attr('id', stations[i].id + '_droneCounter_' + j)
 		.attr('class', stations[i].id + '_droneCounter')
 		.attr("cx", stations[i].position.x + 15)
 		.attr("cy", stations[i].position.y - 8 + 5*j)
@@ -89,12 +89,12 @@ export function simulate() {
 	  // Add a drone to the station
       var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
       drone.marker = field
-      .append("circle")
-	  .attr("id", "adrone")
-      .attr("cx", stations[i].position.x)
-      .attr("cy", stations[i].position.y)
-      .attr("r", 6)
-      .style("fill", "blue");
+		  .append("circle")
+		  .attr("id", "adrone")
+		  .attr("cx", stations[i].position.x)
+		  .attr("cy", stations[i].position.y)
+		  .attr("r", 6)
+		  .style("fill", "blue");
       drones.push(drone)
       gdrones.push(drone)
     }
@@ -109,7 +109,6 @@ export function simulate() {
   var t = d3.timer(step, 150);
 
   function step() {
-	console.log("step is working");
 	if (simulation_stop == 1) {
 		t.stop();
 		return;
