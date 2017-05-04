@@ -37,6 +37,7 @@ export function simulate() {
 
   var time_ms = 0;
 
+
   var interval_id = setInterval(
     function() {
       time_ms += 1 * settings.speed;
@@ -69,7 +70,7 @@ export function simulate() {
 	var territory = new dp.Territory(pillars);
 
   // target
-  var target = new dp.Target(start, 5);
+  var target = new dp.Target(start, 5, settings.speed);
   target.marker = field
   .append("circle")
   .attr("id", "bigfoot")
@@ -136,6 +137,8 @@ export function simulate() {
   		return;
   	}
 
+    target.changeTimeSpeed(settings.speed);
+
     if (target.is_goal_reached(end)) {
       var x = Math.random() * (800 - 0) + 0;
 		  var y = Math.random() * (800 - 0) + 0;
@@ -193,6 +196,8 @@ export function simulate() {
 
     for (var i = 0; i < gdrones.length; i++) {
       var gd = gdrones[i];
+
+      gd.changeTimeSpeed(settings.speed);
 
       if (gd.target) {
         gd.pursue();
