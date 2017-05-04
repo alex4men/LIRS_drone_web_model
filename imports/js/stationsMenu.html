@@ -1,3 +1,21 @@
+
+
 <template name="stationsMenu">
 	<ul class="collection" id="stations_holder"></ul>
+    <li class="collection-item avatar" id="perimeter_point_' + perimeter.length + '">
+        <i class="material-icons circle green">navigation</i>
+        <span class="title">Point + perimeter.length + </span>
+        <p>X: + p.getX() + ; Y: p.getY() +;</p>
+
+        <p>{{test}}</p>
+    </li>
+    <ul>
+        {{#each test}}
+            {{> station}}
+        {{/each}}
+    </ul>
+</template>
+
+<template name="task">
+    <li>{{text}}</li>
 </template>

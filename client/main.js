@@ -4,7 +4,7 @@ import '../imports/js/area.js';
 import '../imports/js/perimeterMenu.js';
 import '../imports/js/stationsMenu.js';
 import '../imports/js/simulateMenu.js';
-
+import '../imports/js/station.js';
 
 import './main.html';
 
