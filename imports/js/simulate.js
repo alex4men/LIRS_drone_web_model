@@ -1,4 +1,4 @@
-import { getRandomInt, getRandomArbitrary } from './utils';
+import { getRandomInt, getRandomArbitrary, getFormatTimeFromSecond } from './utils';
 import { dp } from './ai';
 import { coordsAreInside } from './graham';
 
@@ -34,6 +34,16 @@ export function getVertices() {
 export function simulate() {
   d3.selectAll("#bigfoot").remove();
   d3.selectAll("#adrone").remove();
+
+  var time_ms = 0;
+
+  var interval_id = setInterval(
+    function() {
+      time_ms += 1;
+      Session.set('time_str', getFormatTimeFromSecond(time_ms));
+    }, 1000);
+
+  
   
   simulation_stop = 0;
   var BATTERY_CAPACITY = 55;
@@ -119,6 +129,8 @@ export function simulate() {
   function step() {
   	if (simulation_stop == 1) {
   		t.stop();
+      clearInterval(interval_id);
+
   		return;
   	}
 
@@ -220,10 +232,7 @@ export function simulate() {
     }
   }
 
-
-
   step();
-
 }
 
 export function stopSimulation() {
