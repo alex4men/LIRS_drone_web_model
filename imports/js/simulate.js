@@ -1,4 +1,4 @@
-import { getRandomInt, getRandomArbitrary } from './utils';
+import { getRandomInt, getRandomArbitrary, getFormatTimeFromSecond } from './utils';
 import { dp } from './ai';
 import { coordsAreInside } from './graham';
 
@@ -34,6 +34,17 @@ export function getVertices() {
 export function simulate() {
   d3.selectAll("#bigfoot").remove();
   d3.selectAll("#adrone").remove();
+
+  var time_ms = 0;
+
+
+  var interval_id = setInterval(
+    function() {
+      time_ms += 1 * settings.speed;
+      Session.set('time_str', getFormatTimeFromSecond(time_ms));
+    }, 1000);
+
+  
   
   simulation_stop = 0;
   var BATTERY_CAPACITY = 55;
@@ -59,7 +70,7 @@ export function simulate() {
 	var territory = new dp.Territory(pillars);
 
   // target
-  var target = new dp.Target(start, 5);
+  var target = new dp.Target(start, 5, settings.speed);
   target.marker = field
   .append("circle")
   .attr("id", "bigfoot")
@@ -87,7 +98,9 @@ export function simulate() {
 		.style("fill", "blue");
 	  
 	  // Add a drone to the station
-      var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
+      var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), 
+      settings.droneSpeed, settings.speed, BATTERY_CAPACITY);
+
       drone.marker = field
         .append("circle")
   	    .attr("id", "adrone")
@@ -119,8 +132,12 @@ export function simulate() {
   function step() {
   	if (simulation_stop == 1) {
   		t.stop();
+      clearInterval(interval_id);
+
   		return;
   	}
+
+    target.changeTimeSpeed(settings.speed);
 
     if (target.is_goal_reached(end)) {
       var x = Math.random() * (800 - 0) + 0;
@@ -180,6 +197,8 @@ export function simulate() {
     for (var i = 0; i < gdrones.length; i++) {
       var gd = gdrones[i];
 
+      gd.changeTimeSpeed(settings.speed);
+
       if (gd.target) {
         gd.pursue();
         gd.speed = settings.droneSpeed;
@@ -220,10 +239,7 @@ export function simulate() {
     }
   }
 
-
-
   step();
-
 }
 
 export function stopSimulation() {

@@ -2,7 +2,13 @@ import { Template } from 'meteor/templating';
 
 import './simulateMenu.html';
 import { getWay, simulate, stopSimulation } from './simulate.js';
+import { Session } from 'meteor/session';
 
+Template.simulateMenu.helpers({
+  time() {
+    return Session.get('time_str');
+  }
+});
 
 Template.simulateMenu.events({
 	'click #simulation_run'(event) {
@@ -30,6 +36,8 @@ Template.simulateMenu.events({
 		var el = document.getElementById("simulation_stop");
 		el.innerHTML = 'Run<i class="material-icons right">play_arrow</i>';
 		el.id = "simulation_run";
+
+		Session.set('time_str', '');
 	},
 });
 
