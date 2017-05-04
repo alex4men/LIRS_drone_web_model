@@ -39,7 +39,7 @@ export function simulate() {
 
   var interval_id = setInterval(
     function() {
-      time_ms += 1;
+      time_ms += 1 * settings.speed;
       Session.set('time_str', getFormatTimeFromSecond(time_ms));
     }, 1000);
 
@@ -97,7 +97,9 @@ export function simulate() {
 		.style("fill", "blue");
 	  
 	  // Add a drone to the station
-      var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), settings.droneSpeed, BATTERY_CAPACITY);
+      var drone = new dp.Drone(new dp.Position(stations[i].position.x, stations[i].position.y), 
+      settings.droneSpeed, settings.speed, BATTERY_CAPACITY);
+
       drone.marker = field
         .append("circle")
   	    .attr("id", "adrone")

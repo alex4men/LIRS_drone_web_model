@@ -19,10 +19,11 @@ DronePatrol.prototype.Station = function(id, position, drones = []) {
 	this.targeted = 0;
 }
 
-DronePatrol.prototype.Drone = function(position, speed, capacity) {
+Dronepatrol.prototype.Drone = function(position, speed, timeSpeed, capacity) {
     this.capacity = capacity; // current baterry status
     this.position = position; // current position
     this.speed = speed; // speed of drone
+    this.timeSpeed = timeSpeed; // speed of time
     this.target = null; // target object
     this.pursue_mode = false; // wether drone pursuing target or not
 }
@@ -44,10 +45,12 @@ DronePatrol.prototype.Drone.prototype.move_to = function(position) {
     let alpha = Math.atan(y/x);
 
     let speed = this.speed;
-    if (x < 0 && y >= 0) speed = -speed
-    if (x < 0 && y < 0) speed = -speed
-    if (x >= 0 && y >= 0) speed = speed
-    if (x >= 0 && y < 0) speed = speed
+    let timeSpeed = this.timeSpeed;
+
+    if (x < 0 && y >= 0) speed = -speed * timeSpeed
+    if (x < 0 && y < 0) speed = -speed * timeSpeed
+    if (x >= 0 && y >= 0) speed = speed * timeSpeed
+    if (x >= 0 && y < 0) speed = speed * timeSpeed
 
     let y_delta = Math.sin(alpha) * speed;
     let x_delta = Math.cos(alpha) * speed;
@@ -121,8 +124,8 @@ DronePatrol.prototype.Drone.prototype.pursue = function() {
 
 // Wether drone reached station
 DronePatrol.prototype.Drone.prototype.is_station_reached = function() {
-    if (Math.abs(this.position.x - this.target.position.x) < this.speed &&
-        Math.abs(this.position.y - this.target.position.y) < this.speed
+    if (Math.abs(this.position.x - this.target.position.x) < this.speed * this.timeSpeed &&
+        Math.abs(this.position.y - this.target.position.y) < this.speed * this.timeSpeed
     ) return true;
 
     return false;
@@ -130,8 +133,8 @@ DronePatrol.prototype.Drone.prototype.is_station_reached = function() {
 
 // Wether target reached its goal
 DronePatrol.prototype.Target.prototype.is_goal_reached = function(goal) {
-    if (Math.abs(this.position.x - goal.x) < this.speed &&
-        Math.abs(this.position.y - goal.y) < this.speed
+    if (Math.abs(this.position.x - goal.x) < this.speed * this.timeSpeed &&
+        Math.abs(this.position.y - goal.y) < this.speed * this.timeSpeed
     ) return true;
 
     return false;
@@ -147,10 +150,10 @@ DronePatrol.prototype.Target.prototype.move_to = function(position) {
     let alpha = Math.atan(y/x);
 
     let speed = this.speed;
-    if (x < 0 && y >= 0) speed = -speed
-    if (x < 0 && y < 0) speed = -speed
-    if (x >= 0 && y >= 0) speed = speed
-    if (x >= 0 && y < 0) speed = speed
+    if (x < 0  && y >= 0) speed = -speed * this.timeSpeed 
+    if (x < 0  && y < 0 ) speed = -speed * this.timeSpeed
+    if (x >= 0 && y >= 0) speed = speed  * this.timeSpeed
+    if (x >= 0 && y < 0 ) speed = speed  * this.timeSpeed
 
     let y_delta = Math.sin(alpha) * speed;
     let x_delta = Math.cos(alpha) * speed;
