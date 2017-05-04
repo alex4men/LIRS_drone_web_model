@@ -1,7 +1,7 @@
 <template name="simulateMenu">
 	<form action="#">
         <p class="range-field">
-          Speed: <input type="range" id="simulation_speed" min="1" max="20" onchange="settings.speed=this.value;"/>
+          Simulation speed: <input type="range" id="simulation_speed" min="1" max="100" onchange="settings.speed=this.value;"/>
         </p>
         <p class="range-field">
           Drone speed: <input type="range" id="simulation_dronespeed" min="1" max="10" onchange="settings.droneSpeed=this.value;"/>
