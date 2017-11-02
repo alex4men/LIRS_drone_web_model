@@ -11,6 +11,7 @@
     border: 3px solid #fca15c;
     width: 800px;
     height: 800px;
+    background: url("/images/background.png");
 }
 
 svg {
