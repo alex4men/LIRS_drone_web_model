@@ -47,7 +47,7 @@ export function simulate() {
   
   
   simulation_stop = 0;
-  var BATTERY_CAPACITY = 55;
+  var BATTERY_CAPACITY = 100;
 
   // start positions for bigfoot
   var way = getWay();
