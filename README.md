@@ -1,12 +1,15 @@
 # LIRS_drone_web_model
+
 Web application for imitation simulation of security drones.
+
 ---
+
 ## Demo
 ![](demo.gif)
 
 ## Description
 
-The purpose of this application is to simulate UAV (drone) behaviour (blue dot) in security application and determine how many ground stations (blue squares) are necessary to secure the whole inner perimeter (black squares with blue lines) from an intruder (purple dot). 
+The purpose of this application is to simulate UAV (drone) behaviour (blue dot) in security application and determine how many ground stations (blue squares) are necessary to secure the whole inner perimeter (black squares with blue lines) from an intruder (purple dot).
 
 Each ground station can charge and store up to 3 drones (dots near the blue square). When an intruder is crossing the perimeter, a drone from the nearest station is dispatched to follow and watch over the intruder. When the drone is running out of charge (green line), the next drone from the nearest station is dispatched and the previous drone could return to the closest free station.
 
