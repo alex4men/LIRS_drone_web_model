@@ -23,7 +23,7 @@ svg {
 	width: 20px;
 	height: 20px;
 	position: absolute;
-	transform: translate(-50%, -50%);
+	transform: translate(-10px, -10px);
 }
 
 .baterey{
@@ -34,14 +34,14 @@ svg {
 
 .baterey_none{
 	width: 0px;
-	height: 0px;	
+	height: 0px;
 }
 
 .station {
 	width: 20px;
 	height: 20px;
 	fill: blue;
-	transform: translate(-50%, -50%);
+	transform: translate(-10px, -10px);
 
 }
 
@@ -55,14 +55,14 @@ svg {
 	width: 20px;
 	height: 20px;
 	fill: green;
-	transform: translate(-50%, -50%);
+	transform: translate(-10px, -10px);
 }
 
 #end {
 	width: 20px;
 	height: 20px;
 	fill: red;
-	transform: translate(-50%, -50%);
+	transform: translate(-10px, -10px);
 }
 
 .tabs-fixed-width {
